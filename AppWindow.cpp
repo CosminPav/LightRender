@@ -11,6 +11,7 @@
 #include "PixelShader.h"
 #include "RenderSystem.h"
 #include <Windows.h>
+#include <iostream>
 
 #include "InputSystem.h"
 #include "Vector3D.h"
@@ -36,6 +37,99 @@ struct Constants
 
 AppWindow::AppWindow()
 {
+	{
+		//DWindow::OnCreate();
+
+		//std::cout << "Creating..." << std::endl;
+
+
+		////Register input system
+		//Input::InputSystem::Get()->AddListener(this);
+		//Input::InputSystem::Get()->HideCursor(false);
+
+		////Initalize the graphics pipline
+		//RECT rc = GetClientWindowRect();
+		//mSwapChain = GraphicsEngine::Get()->GetRenderSystem()->MakeSwapChain(hwnd, rc.right - rc.left, rc.bottom - rc.top);
+
+		//mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
+
+		////Vertex list
+		//Vertex VList[] =
+		//{
+		//	//FRONT FACE
+		//	{Math::Vector3D(-0.5f, -0.5f, -0.5f),		Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},
+		//	{Math::Vector3D(-0.5f, 0.5f, -0.5f),		Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},
+		//	{Math::Vector3D(0.5f, 0.5f, -0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},
+		//	{Math::Vector3D(0.5f, -0.5f, -0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},
+
+		//	//Back face
+		//	{Math::Vector3D(0.5f, -0.5f, 0.5f),			Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},
+		//	{Math::Vector3D(0.5f, 0.5f, 0.5f),			Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},
+		//	{Math::Vector3D(-0.5f, 0.5f, 0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},
+		//	{Math::Vector3D(-0.5f, -0.5f, 0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},
+		//};
+
+		//unsigned int IndexList[] =
+		//{
+		//	//Front side
+		//	0,1,2,
+		//	2,3,0,
+		//	//Back side
+		//	4,5,6,
+		//	6,7,4,
+		//	//Top
+		//	1,6,5,
+		//	5,2,1,
+		//	//Bottom
+		//	7,0,3,
+		//	3,4,7,
+		//	//Right side
+		//	3,2,5,
+		//	5,4,3,
+		//	//Left side
+		//	7,6,1,
+		//	1,0,7
+		//};
+
+
+		////INDEX BUFFER
+		//mIndexBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeIndexBuffer(IndexList, ARRAYSIZE(IndexList));
+
+		////ptr to mem buffer
+		//void* ShaderByteCode = nullptr;
+		////the zize if mem buffer in bytes
+		//size_t SizeOfShader = 0;
+
+		////VERTEX SHADER
+
+		////compile the vertex shader from file
+		//GraphicsEngine::Get()->GetRenderSystem()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &ShaderByteCode, &SizeOfShader);
+
+		////Create the verrtex shader
+		//mVertexShader = GraphicsEngine::Get()->GetRenderSystem()->MakeVertexShader(ShaderByteCode, SizeOfShader);
+
+		////make the vertex buffer
+		//mVertexBuffer = GraphicsEngine::Get()->GetRenderSystem()->CreateVertexBuffer(VList, sizeof(Vertex), ARRAYSIZE(VList), ShaderByteCode, static_cast<UINT>(SizeOfShader));
+
+		//GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
+
+		////PIXEL SHADER
+
+		////Compile the pixel shader file
+		//GraphicsEngine::Get()->GetRenderSystem()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &ShaderByteCode, &SizeOfShader);
+		////Make the pixel shader
+		//mPixelShader = GraphicsEngine::Get()->GetRenderSystem()->MakePixelShader(ShaderByteCode, SizeOfShader);
+		////release the pixel shader
+		//GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
+
+
+		//Constants constant;
+		//constant.mAngle = 0;
+
+		////CONSTANT BUFFER
+		////Make the constant buffer
+		//mConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
+	}
 }
 
 void AppWindow::Update()
@@ -183,6 +277,7 @@ void AppWindow::OnRightMouseButtonUp(const Point& MousePos)
 	Scale = 1.0f;
 }
 
+//May be deleted, but later
 void AppWindow::OnCreate()
 {
 	DWindow::OnCreate();

@@ -8,6 +8,8 @@
 #include "PixelShader.h"
 #include <d3dcompiler.h>
 
+#include <iostream>
+
 RenderSystem::RenderSystem()
 {
     //Driver types
@@ -97,7 +99,7 @@ bool RenderSystem::CompilePixelShader(const wchar_t* FileName, const char* Entry
 
 SwapChainPtr RenderSystem::MakeSwapChain(HWND hwnd, UINT Width, UINT Height)
 {
-    SwapChainPtr Sc;
+    SwapChainPtr Sc = nullptr;
     try {
         Sc = std::make_shared<SwapChain>(hwnd, Width, Height, this);
     }

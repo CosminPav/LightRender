@@ -9,6 +9,8 @@ namespace Input
 {
 	class InputSystem 
 	{
+		static InputSystem* mInput;
+
 		//std::map< InputListener*, InputListener*> Listeners;
 		std::unordered_set<InputListener*> Listeners;
 		unsigned char KeysStates[256] = {};
@@ -18,6 +20,8 @@ namespace Input
 
 		bool bFirstTime{ true };
 
+		InputSystem();
+		~InputSystem();
 	public:
 		void AddListener(InputListener* Listener);
 		void RemoveListener(InputListener* Listener);
@@ -27,6 +31,8 @@ namespace Input
 
 		void Update();
 	
+		static void Create();
+		static void Release();
 
 		static InputSystem* Get();
 	};

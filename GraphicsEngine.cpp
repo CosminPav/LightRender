@@ -22,6 +22,7 @@ GraphicsEngine* GraphicsEngine::Get()
 
 void GraphicsEngine::Create()
 {
+
     if (GraphicsEngine::mEngine)
         throw std::exception("Graphics Engine already exists");
     GraphicsEngine::mEngine = new GraphicsEngine();
@@ -36,6 +37,7 @@ void GraphicsEngine::Release()
 
 GraphicsEngine::~GraphicsEngine() noexcept
 {
+    GraphicsEngine::mEngine = nullptr;
    delete mSystem;
 }
 

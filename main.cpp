@@ -1,22 +1,31 @@
 #include "AppWindow.h"
 #include "GraphicsEngine.h"
-#include <iostream>
+#include "InputSystem.h"
 
 int main()
 {
 	try {
+	
 		GraphicsEngine::Create();
+		Input::InputSystem::Create();
 	}
 	catch (...) {
+		return -1;
+	}
+
+	try {
+		AppWindow App;
+		while (App.IsRunning());
+	}
+	catch (...) {
+		Input::InputSystem::Release();
+		GraphicsEngine::Release();
 		return 1;
 	}
 
-
-	AppWindow App;
-	while (App.IsRunning()) {
-		App.Broadcast();	
-	}
-	
+	//RELEASE THE INPUT SYSTEM AND THE GRAPHICS ENGINE WHEN THE WINDOW MESSAGE IS 0
+	Input::InputSystem::Release();
 	GraphicsEngine::Release();
+	
 	return 0;
 } 

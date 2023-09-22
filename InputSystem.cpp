@@ -3,6 +3,20 @@
 #include <Windows.h>
 #include "Point.h"
 
+Input::InputSystem* Input::InputSystem::mInput = nullptr;
+
+Input::InputSystem::InputSystem()
+{
+
+}
+
+void Input::InputSystem::Create()
+{
+    if (InputSystem::mInput)
+        throw std::exception("Input System already exists");
+    InputSystem::mInput = new InputSystem();
+}
+
 void Input::InputSystem::AddListener(InputListener* Listener)
 {
     Listeners.insert(Listener);
@@ -95,4 +109,17 @@ Input::InputSystem* Input::InputSystem::Get()
 void Input::InputSystem::HideCursor(bool Show)
 {
     ShowCursor(Show);
+}
+
+void Input::InputSystem::Release()
+{
+    if (!InputSystem::mInput)
+        return;
+    delete InputSystem::mInput;
+}
+
+
+Input::InputSystem::~InputSystem()
+{
+    InputSystem::mInput = nullptr;
 }

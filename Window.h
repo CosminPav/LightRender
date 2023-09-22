@@ -6,19 +6,17 @@ class DWindow
 {
 	//Check if the window is running or not
 	bool bIsRunning{ false };
-
+	bool bIsInit{ false };
 public:
+	//Init the window
 	DWindow();
 
 	bool Broadcast();
 	//Check if the window is opend and running
-	inline bool IsRunning() { return bIsRunning; }
+	bool IsRunning();
 
 	//Get the size of the window
 	RECT GetClientWindowRect();
-
-	//Set the window handle
-	void SetWindowHandle(HWND HandleToSet) {hwnd = HandleToSet; }
 
 	virtual void OnCreate();
 	virtual void OnUpdate();

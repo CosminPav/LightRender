@@ -11,6 +11,8 @@ class IndexBuffer;
 class RenderSystem;
 class GraphicsEngine;
 
+//using SwapChainPtr = std::unique_ptr<SwapChain>;
+
 typedef std::shared_ptr<SwapChain> SwapChainPtr;
 typedef std::shared_ptr<DeviceContext> DeviceContextPtr;
 typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;

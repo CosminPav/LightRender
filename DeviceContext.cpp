@@ -14,10 +14,9 @@ DeviceContext::DeviceContext(ID3D11DeviceContext* DeviceContext, RenderSystem* S
 void DeviceContext::ClearRenderTargetColor(SwapChainPtr SwapChain, float Red, float Green, float Blue, float Alpha)
 {
 	FLOAT ClearColor[] = { Red, Green, Blue, Alpha };
-	
-	
-		mDeviceContext->ClearRenderTargetView(SwapChain->mRenderTargetView, ClearColor);
-		mDeviceContext->OMSetRenderTargets(1, &SwapChain->mRenderTargetView, nullptr);
+		
+	mDeviceContext->ClearRenderTargetView(SwapChain->mRenderTargetView, ClearColor);
+	mDeviceContext->OMSetRenderTargets(1, &SwapChain->mRenderTargetView, nullptr);
 
 }
 

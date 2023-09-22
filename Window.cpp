@@ -11,11 +11,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		// Event fired when the window is created
 		// collected here..
-		DWindow* window = (DWindow*)((LPCREATESTRUCT)lparam)->lpCreateParams;
+		
+		//DWindow* window = (DWindow*)((LPCREATESTRUCT)lparam)->lpCreateParams;
 		// .. and then stored for later lookup
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
-		window->SetWindowHandle(hwnd);
-		window->OnCreate();
+		//SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
+		//window->SetWindowHandle(hwnd);
+		//window->OnCreate();
 		break;
 	}
 
@@ -30,7 +31,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_SETFOCUS:
 	{
 		DWindow* window = (DWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-		window->OnFocus();
+		if(window)
+			window->OnFocus();
 		break;
 	}
 	case WM_KILLFOCUS:
@@ -73,7 +75,7 @@ DWindow::DWindow()
 	//Creation of the window
 	hwnd = CreateWindowEx(0, L"MyWindowClass", L"DirectX Application",
 		WS_CAPTION | WS_SYSMENU | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768,
-		NULL, NULL, NULL, this);
+		NULL, NULL, NULL, NULL);
 
 	//if the creation fail return false
 	if (!hwnd)
@@ -94,11 +96,15 @@ DWindow::DWindow()
 bool DWindow::Broadcast()
 {
 	MSG msg;
+	if (!bIsInit) {
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+		OnCreate();
+		bIsInit = true;
+	}
 
 	this->OnUpdate();
 
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
-	{
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -106,6 +112,13 @@ bool DWindow::Broadcast()
 	Sleep(1);
 
 	return true;
+}
+
+bool DWindow::IsRunning()
+{
+	if (bIsRunning)
+		Broadcast();
+	return bIsRunning;
 }
 
 RECT DWindow::GetClientWindowRect()
@@ -139,5 +152,5 @@ void DWindow::StopFocus()
 
 DWindow::~DWindow() noexcept
 {
-	DestroyWindow(hwnd);
+	//DestroyWindow(hwnd);
 }

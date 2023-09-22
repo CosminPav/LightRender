@@ -12,7 +12,7 @@ class DWindow;
 
 class AppWindow : public DWindow, public InputListener
 {
-	SwapChainPtr mSwapChain;
+	SwapChainPtr mSwapChain = nullptr;
 	VertexBufferPtr mVertexBuffer;
 	IndexBufferPtr mIndexBuffer;
 	VertexShaderPtr mVertexShader;

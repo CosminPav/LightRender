@@ -32,7 +32,7 @@ SwapChain::SwapChain(HWND hwnd, UINT Width, UINT Height, RenderSystem* System) :
 	}
 		
 
-	//Get the back buffer
+	//Get the back buffer color and create its render target view
 	ID3D11Texture2D* Buffer = nullptr;
 
 	hRes = dxgiSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&Buffer);
@@ -51,7 +51,6 @@ SwapChain::SwapChain(HWND hwnd, UINT Width, UINT Height, RenderSystem* System) :
 
 bool SwapChain::Preseant(bool vSync)
 {
-	//dxgi swap chain is a nullptr
 	dxgiSwapChain->Present(vSync, NULL);
 	return true;
 }
