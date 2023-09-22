@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{cd4158e0-ddd9-4e2b-bf3c-fc50615580ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{35ce2bbd-2c5d-40f7-bfbd-961e27d54445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Windowing">
+      <UniqueIdentifier>{3171a492-b9ee-47d7-8c8b-79bf5cb2d536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine">
+      <UniqueIdentifier>{72459d71-3f65-4628-9c55-5f3316787449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math">
+      <UniqueIdentifier>{e12b45fc-70d8-428f-b4ce-0fb2a6a79b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\InputSystem">
+      <UniqueIdentifier>{d3295c0d-96ab-4403-83eb-a444e18a5dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render">
+      <UniqueIdentifier>{3b21453a-ae17-4218-9baa-f3b325c5bf71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\ConstantBuffer">
+      <UniqueIdentifier>{2e02d053-0eb1-467a-87b7-0f3a8e63b85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\DeviceContext">
+      <UniqueIdentifier>{cee88146-491c-4a35-9040-035bd5d5603b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\IndexBuffer">
+      <UniqueIdentifier>{190280ae-aea2-433a-a58f-a4bd1390b543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\PixelShader">
+      <UniqueIdentifier>{17758542-af1b-4d95-b84f-36a21c8dcb3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\SwapChain">
+      <UniqueIdentifier>{2a3a493d-e7db-47a0-aacb-86f6d9ca70f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\VertexBuffer">
+      <UniqueIdentifier>{68456fb8-181d-46dc-afc8-efcd80952610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GraphicsEngine\Render\VertexShader">
+      <UniqueIdentifier>{d83b77f1-823b-48ae-98c2-4bea7bbad3cc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Window.cpp">
+      <Filter>Engine\Windowing</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="AppWindow.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsEngine.cpp">
+      <Filter>Engine\GraphicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>Engine\GraphicsEngine\Render\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceContext.cpp">
+      <Filter>Engine\GraphicsEngine\Render\DeviceContext</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Engine\GraphicsEngine\Render\VertexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>Engine\GraphicsEngine\Render\VertexShader</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Engine\GraphicsEngine\Render\PixelShader</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Engine\GraphicsEngine\Render\ConstantBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Engine\GraphicsEngine\Render\IndexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>Engine\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>Engine\GraphicsEngine\Render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Window.h">
+      <Filter>Engine\Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="AppWindow.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsEngine.h">
+      <Filter>Engine\GraphicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>Engine\GraphicsEngine\Render\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceContext.h">
+      <Filter>Engine\GraphicsEngine\Render\DeviceContext</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Engine\GraphicsEngine\Render\VertexBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Engine\GraphicsEngine\Render\VertexShader</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Engine\GraphicsEngine\Render\PixelShader</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Engine\GraphicsEngine\Render\ConstantBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4X4.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>Engine\GraphicsEngine\Render\IndexBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.h">
+      <Filter>Engine\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputInterface.h">
+      <Filter>Engine\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4D.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>Engine\GraphicsEngine\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Prerequisites.h">
+      <Filter>Engine\GraphicsEngine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Main</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Main</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
