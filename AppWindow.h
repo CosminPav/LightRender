@@ -19,6 +19,9 @@ class AppWindow : public DWindow, public InputListener
 	PixelShaderPtr mPixelShader;
 	ConstantBufferPtr mConstantBuffer;
 
+
+	TexturePtr WoodTexture;
+
 	Math::Matrix4X4 mWorldCam;
 
 	float Forward{ 0.0f };

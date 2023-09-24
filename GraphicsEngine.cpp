@@ -13,6 +13,13 @@ GraphicsEngine::GraphicsEngine()
         throw std::exception("Render system failed to create");
     }
    
+    try {
+        mTextureManager = new TextureManager();
+    }
+    catch (...) {
+        throw std::exception("Texture Manager failed to create");
+    }
+
 }
 
 GraphicsEngine* GraphicsEngine::Get()
@@ -38,6 +45,7 @@ void GraphicsEngine::Release()
 GraphicsEngine::~GraphicsEngine() noexcept
 {
     GraphicsEngine::mEngine = nullptr;
+    delete mTextureManager;
    delete mSystem;
 }
 

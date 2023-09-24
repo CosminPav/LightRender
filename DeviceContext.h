@@ -18,24 +18,28 @@ class DeviceContext
 public:
 	DeviceContext(ID3D11DeviceContext* DeviceContext, RenderSystem* System); 
 
-	void ClearRenderTargetColor(SwapChainPtr SwapChain, float Red, float Green, float Blue, float Alpha);
+	void ClearRenderTargetColor(const SwapChainPtr& SwapChain, float Red, float Green, float Blue, float Alpha);
 
 	//Vertex buffer
-	void SetVertexBuffer(VertexBufferPtr Buffer);
+	void SetVertexBuffer(const VertexBufferPtr& Buffer);
 
 	//Index buffer
-	void SetIndexBuffer(IndexBufferPtr Buffer);
+	void SetIndexBuffer(const IndexBufferPtr& Buffer);
 
 	//Constant buffer
-	void SetConstantBuffer(VertexShaderPtr vertexShader, ConstantBufferPtr constantBuffer);
-	void SetConstantBuffer(PixelShaderPtr pixelShader, ConstantBufferPtr constantBuffer);
+	void SetConstantBuffer(const VertexShaderPtr& vertexShader,const ConstantBufferPtr& constantBuffer);
+	void SetConstantBuffer(const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer);
+
+	//Texture coord
+	void SetTexture(const VertexShaderPtr& vertexShader, const TexturePtr& Texture);
+	void SetTexture(const PixelShaderPtr& pixelShader, const TexturePtr& Texture);
 
 
 	//VertexShdaer
-	void SetVertexShader(VertexShaderPtr vertexShader);
+	void SetVertexShader(const VertexShaderPtr& vertexShader);
 
 	//Pixel Shader
-	void SetPixelShader(PixelShaderPtr pixelShader);
+	void SetPixelShader(const PixelShaderPtr& pixelShader);
 
 	//
 	void DrawTriangleList(UINT VertexCount, UINT VertexStartIndex);

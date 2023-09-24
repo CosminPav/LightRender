@@ -15,14 +15,14 @@
 
 #include "InputSystem.h"
 #include "Vector3D.h"
+#include "Vector2D.h"
 #include "Matrix4X4.h"
 #include "Point.h"
 
 struct Vertex
 {
 	Math::Vector3D Position;
-	Math::Vector3D Color;
-	Math::Vector3D Color_1;
+	Math::Vector2D TexCoord;
 };
 
 __declspec(align(16))
@@ -286,26 +286,68 @@ void AppWindow::OnCreate()
 	Input::InputSystem::Get()->AddListener(this);
 	Input::InputSystem::Get()->HideCursor(false);
 
+	//Init the texture manager
+	WoodTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\wood.jpg");
+
 	//Initalize the graphics pipline
 	RECT rc = GetClientWindowRect();
 	mSwapChain = GraphicsEngine::Get()->GetRenderSystem()->MakeSwapChain(hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
 
+	Math::Vector3D PosList[] =
+	{
+		{Math::Vector3D(-0.5f, -0.5f, -0.5f)},
+		{Math::Vector3D(-0.5f, 0.5f, -0.5f)},
+		{Math::Vector3D(0.5f, 0.5f, -0.5f)},
+		{Math::Vector3D(0.5f, -0.5f, -0.5f)},
+
+		//Back face
+		{Math::Vector3D(0.5f, -0.5f, 0.5f)},
+		{Math::Vector3D(0.5f, 0.5f, 0.5f)},
+		{Math::Vector3D(-0.5f, 0.5f, 0.5f)},
+		{Math::Vector3D(-0.5f, -0.5f, 0.5f)}
+	};
+
+
+	Math::Vector2D TextureList[] =
+	{
+		{Math::Vector2D(0.0f, 0.0f)},
+		{Math::Vector2D(0.0f, 1.0f)},
+		{Math::Vector2D(1.0f, 0.0f)},
+		{Math::Vector2D(1.0f, 1.0f)}
+	};
+
 	//Vertex list
 	Vertex VList[] =
 	{
 		//FRONT FACE
-		{Math::Vector3D (-0.5f, -0.5f, -0.5f),		Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},	
-		{Math::Vector3D (-0.5f, 0.5f, -0.5f),		Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},	
-		{Math::Vector3D(0.5f, 0.5f, -0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},	
-		{Math::Vector3D(0.5f, -0.5f, -0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},	
+		{PosList[0], TextureList[1]},
+		{PosList[1], TextureList[0]},
+		{PosList[2], TextureList[2]},
+		{PosList[3], TextureList[3]},
 
-		//Back face
-		{Math::Vector3D(0.5f, -0.5f, 0.5f),			Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},
-		{Math::Vector3D(0.5f, 0.5f, 0.5f),			Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},
-		{Math::Vector3D(-0.5f, 0.5f, 0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},
-		{Math::Vector3D(-0.5f, -0.5f, 0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},
+		//Back Face
+		{PosList[4], TextureList[1]},
+		{PosList[5], TextureList[0]},
+		{PosList[6], TextureList[2]},
+		{PosList[7], TextureList[3]},
+
+		{PosList[1], TextureList[1]},
+		{PosList[6], TextureList[0]},
+		{PosList[5], TextureList[2]},
+		{PosList[2], TextureList[3]},
+
+		{PosList[3], TextureList[1]},
+		{PosList[2], TextureList[0]},
+		{PosList[5], TextureList[2]},
+		{PosList[4], TextureList[3]},
+
+		{PosList[7], TextureList[1]},
+		{PosList[6], TextureList[0]},
+		{PosList[1], TextureList[2]},
+		{PosList[0], TextureList[3]}
+
 	};
 
 	unsigned int IndexList[] =
@@ -317,17 +359,17 @@ void AppWindow::OnCreate()
 		4,5,6,
 		6,7,4,
 		//Top
-		1,6,5,
-		5,2,1,
+		8,9,10,
+		10,11,8,
 		//Bottom
-		7,0,3,
-		3,4,7,
+		12,13,14,
+		14,15,12,
 		//Right side
-		3,2,5,
-		5,4,3,
+		16,17,18,
+		18,19,16,
 		//Left side
-		7,6,1,
-		1,0,7
+		20,21,22,
+		22,23,20
 	};
 
 
@@ -394,6 +436,9 @@ void AppWindow::OnUpdate()
 	//SET THE VERTEX AND PIXEL SHADERS
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexShader(mVertexShader);
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetPixelShader(mPixelShader);
+
+	//Set texture
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(mPixelShader, WoodTexture);
 
 	//Set the vertex buffer
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(mVertexBuffer);

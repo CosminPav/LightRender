@@ -12,6 +12,7 @@ class RenderSystem
 	friend class ConstantBuffer;
 	friend class VertexShader;
 	friend class PixelShader;
+	friend class Texture;
 
 	//diect x inteface
 	ID3D11Device* d3dDevice = nullptr;
