@@ -55,6 +55,8 @@ RenderSystem::RenderSystem()
     //dxgiDevice.As(&dxgiAdapter);
     dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
     //dxgiAdapter.As(&dxgiFactory);
+
+    InitRasterizerState();
 }
 
 //custom vertex shader
@@ -97,6 +99,21 @@ bool RenderSystem::CompilePixelShader(const wchar_t* FileName, const char* Entry
 }
 //swap chain
 
+void RenderSystem::InitRasterizerState()
+{
+    //Front face culling
+    D3D11_RASTERIZER_DESC desc = {};
+    desc.CullMode = D3D11_CULL_FRONT;
+    desc.DepthClipEnable = true;
+    desc.FillMode = D3D11_FILL_SOLID;
+
+    d3dDevice->CreateRasterizerState(&desc, &mCullFrontState);
+
+    //Back face culling
+    desc.CullMode = D3D11_CULL_BACK;
+    d3dDevice->CreateRasterizerState(&desc, &mCullBackState);
+}
+
 SwapChainPtr RenderSystem::MakeSwapChain(HWND hwnd, UINT Width, UINT Height)
 {
     SwapChainPtr Sc = nullptr;
@@ -114,7 +131,7 @@ VertexBufferPtr RenderSystem::CreateVertexBuffer(void* ListVertices, UINT SizeVe
 {
     VertexBufferPtr Vb = nullptr;
     try {
-        Vb = std::make_shared < VertexBuffer>(ListVertices, SizeVertex, ListSize, ShaderByteCode, SizeShderByte, this);
+        Vb = std::make_shared <VertexBuffer>(ListVertices, SizeVertex, ListSize, ShaderByteCode, SizeShderByte, this);
     }
     catch (...) {
     }
@@ -171,6 +188,15 @@ PixelShaderPtr RenderSystem::MakePixelShader(const void* SharedByteCode, size_t 
 
     }
     return pixelShader;
+}
+
+void RenderSystem::SetRazterizerState(bool bCullFront)
+{
+    if (bCullFront) 
+        mImmContext->RSSetState(mCullFrontState);
+    else 
+        mImmContext->RSSetState(mCullBackState); 
+    
 }
 
 RenderSystem::~RenderSystem()

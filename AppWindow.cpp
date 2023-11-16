@@ -19,6 +19,8 @@
 #include "Matrix4X4.h"
 #include "Point.h"
 
+#include "Mesh.h"
+
 struct Vertex
 {
 	Math::Vector3D Position;
@@ -31,194 +33,19 @@ struct Constants
 	Math::Matrix4X4 World;
 	Math::Matrix4X4 View;
 	Math::Matrix4X4 Projection;
-	unsigned int mAngle{ 0 };
-	//float mAngle{ 0.0f };
+	Math::Vector4D LightDirection;
+	Math::Vector4D CameraPosition;
 };
 
 AppWindow::AppWindow()
 {
-	{
-		//DWindow::OnCreate();
-
-		//std::cout << "Creating..." << std::endl;
-
-
-		////Register input system
-		//Input::InputSystem::Get()->AddListener(this);
-		//Input::InputSystem::Get()->HideCursor(false);
-
-		////Initalize the graphics pipline
-		//RECT rc = GetClientWindowRect();
-		//mSwapChain = GraphicsEngine::Get()->GetRenderSystem()->MakeSwapChain(hwnd, rc.right - rc.left, rc.bottom - rc.top);
-
-		//mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
-
-		////Vertex list
-		//Vertex VList[] =
-		//{
-		//	//FRONT FACE
-		//	{Math::Vector3D(-0.5f, -0.5f, -0.5f),		Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},
-		//	{Math::Vector3D(-0.5f, 0.5f, -0.5f),		Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},
-		//	{Math::Vector3D(0.5f, 0.5f, -0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},
-		//	{Math::Vector3D(0.5f, -0.5f, -0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},
-
-		//	//Back face
-		//	{Math::Vector3D(0.5f, -0.5f, 0.5f),			Math::Vector3D(1,0,0),		Math::Vector3D(0,1,0)},
-		//	{Math::Vector3D(0.5f, 0.5f, 0.5f),			Math::Vector3D(0,1,0),		Math::Vector3D(1,1,0)},
-		//	{Math::Vector3D(-0.5f, 0.5f, 0.5f),			Math::Vector3D(0,0,1),		Math::Vector3D(1,0,0)},
-		//	{Math::Vector3D(-0.5f, -0.5f, 0.5f),		Math::Vector3D(1,1,0),		Math::Vector3D(0,0,1)},
-		//};
-
-		//unsigned int IndexList[] =
-		//{
-		//	//Front side
-		//	0,1,2,
-		//	2,3,0,
-		//	//Back side
-		//	4,5,6,
-		//	6,7,4,
-		//	//Top
-		//	1,6,5,
-		//	5,2,1,
-		//	//Bottom
-		//	7,0,3,
-		//	3,4,7,
-		//	//Right side
-		//	3,2,5,
-		//	5,4,3,
-		//	//Left side
-		//	7,6,1,
-		//	1,0,7
-		//};
-
-
-		////INDEX BUFFER
-		//mIndexBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeIndexBuffer(IndexList, ARRAYSIZE(IndexList));
-
-		////ptr to mem buffer
-		//void* ShaderByteCode = nullptr;
-		////the zize if mem buffer in bytes
-		//size_t SizeOfShader = 0;
-
-		////VERTEX SHADER
-
-		////compile the vertex shader from file
-		//GraphicsEngine::Get()->GetRenderSystem()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &ShaderByteCode, &SizeOfShader);
-
-		////Create the verrtex shader
-		//mVertexShader = GraphicsEngine::Get()->GetRenderSystem()->MakeVertexShader(ShaderByteCode, SizeOfShader);
-
-		////make the vertex buffer
-		//mVertexBuffer = GraphicsEngine::Get()->GetRenderSystem()->CreateVertexBuffer(VList, sizeof(Vertex), ARRAYSIZE(VList), ShaderByteCode, static_cast<UINT>(SizeOfShader));
-
-		//GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
-
-		////PIXEL SHADER
-
-		////Compile the pixel shader file
-		//GraphicsEngine::Get()->GetRenderSystem()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &ShaderByteCode, &SizeOfShader);
-		////Make the pixel shader
-		//mPixelShader = GraphicsEngine::Get()->GetRenderSystem()->MakePixelShader(ShaderByteCode, SizeOfShader);
-		////release the pixel shader
-		//GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
-
-
-		//Constants constant;
-		//constant.mAngle = 0;
-
-		////CONSTANT BUFFER
-		////Make the constant buffer
-		//mConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
-	}
 }
 
 void AppWindow::Update()
 {
-	//Calculate the delta time
-	/*unsigned long NewTime = 0;
-	if (mOldTime)
-		NewTime = static_cast<unsigned long>(GetTickCount64()) - mOldTime;
-	mDeltaTime = NewTime / 1000.0f;
-	mOldTime = static_cast<unsigned long>(GetTickCount64());
-
-	mAngle += 1.75f * mDeltaTime;*/
-	Constants constant;
-	constant.mAngle = static_cast<unsigned int>(GetTickCount64());
-
-	mDeltaPos += mDeltaTime / 10.5f;
-	if (mDeltaPos > 1.0f)
-		mDeltaPos = 0.0f;
-
-	Math::Matrix4X4 TempMatrix;
-
-	//Delta scale
-	mDeltaScale += mDeltaTime / 0.55f;
-	
-	//Setup scale animation
-	/*
-	//constant.World.SetScale(Math::Vector3D::Lerp(Math::Vector3D(0.5f, 0.5f, 0.0f), Math::Vector3D(1.0f, 1.0f, 0.0f), (sin(mDeltaScale) + 1.0f)/2.0f));
-
-	//TempMatrix.SetTranslation(Math::Vector3D::Lerp(Math::Vector3D(-1.5f, -1.5f, 0.0f), Math::Vector3D(1.5f, 1.5f, 0.0f), mDeltaPos));
-
-	//constant.World *= TempMatrix;
-
-	*/
-	
-	//constant.World.SetScale(Math::Vector3D(Scale, Scale, Scale));
-
-	//Setup rotation animation through the rotation matrix
-	/*
-	{
-		TempMatrix.SetIdentity();
-		TempMatrix.SetRotationZ(0.0f);
-		constant.World *= TempMatrix;
-
-		TempMatrix.SetIdentity();
-		TempMatrix.SetRotationY(RotationY);
-		constant.World *= TempMatrix;
-
-		TempMatrix.SetIdentity();
-		TempMatrix.SetRotationX(RotationX);
-		constant.World *= TempMatrix;
-	}
-	*/
-	
-	constant.World.SetIdentity();
-
-	Math::Matrix4X4 WorldCam;
-	WorldCam.SetIdentity();
-
-	TempMatrix.SetIdentity();
-	TempMatrix.SetRotationX(RotationX);
-	WorldCam *= TempMatrix;
-	
-
-	TempMatrix.SetIdentity();
-	TempMatrix.SetRotationY(RotationY);
-	WorldCam *= TempMatrix;
-
-	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.3f);
-	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.3f);
-
-	WorldCam.SetTranslation(NewPos);
-
-	mWorldCam = WorldCam;
-
-	WorldCam.Inverse();
-
-	constant.View = WorldCam;
-
-	//constant.Projection.SetOrthiH((GetClientWindowRect().right - GetClientWindowRect().left)/400.f,
-								//(GetClientWindowRect().bottom - GetClientWindowRect().top)/400.f, -4.f, 4.f);
-
-	int Width = GetClientWindowRect().right - GetClientWindowRect().left;
-	int Height = GetClientWindowRect().bottom - GetClientWindowRect().top;
-
-	constant.Projection.SetPerspectiveFOVLh(1.57f, static_cast<float>(Width / Height), 0.1f, 100.f);
-
-	//Update the constant buffer
-	mConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
-
+	UpdateCamera();
+	UpdateModel();
+	UpdateSkyBox();
 }
 
 void AppWindow::OnKeyDown(int key)
@@ -262,6 +89,29 @@ void AppWindow::OnLeftMouseButtonDown(const Point& MousePos)
 	Scale = 0.5f;
 }
 
+void AppWindow::DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr& texture)
+{
+	//Set the constant buffer with vertex and pixel shader
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(vertexShader, constantBuffer);
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(pixelShader, constantBuffer);
+
+	//SET THE VERTEX AND PIXEL SHADERS
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexShader(vertexShader);
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetPixelShader(pixelShader);
+
+	//Set texture
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(pixelShader, texture);
+
+	//Set the vertex buffer
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(Mesh->GetVertexBuffer());
+
+	//Set the index buffer
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetIndexBuffer(Mesh->GetIndexBuffer());
+
+	//GraphicsEngine::Get()->GetImmDeviceContext()->DrawTriangleStrip(mVertexBuffer->GetVertexSize(), 0);
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->DrawIndexTriangleList(Mesh->GetIndexBuffer()->GetSizeIndexList(), 0, 0);
+}
+
 void AppWindow::OnLeftMouseButtonUp(const Point& MousePos)
 {
 	Scale = 1.0f;
@@ -277,6 +127,73 @@ void AppWindow::OnRightMouseButtonUp(const Point& MousePos)
 	Scale = 1.0f;
 }
 
+void AppWindow::UpdateCamera()
+{
+	Math::Matrix4X4 WorldCam, TempMatrix;
+	WorldCam.SetIdentity();
+
+	TempMatrix.SetIdentity();
+	TempMatrix.SetRotationX(RotationX);
+	WorldCam *= TempMatrix;
+
+
+	TempMatrix.SetIdentity();
+	TempMatrix.SetRotationY(RotationY);
+	WorldCam *= TempMatrix;
+
+	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.3f);
+	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.3f);
+
+	WorldCam.SetTranslation(NewPos);
+	mWorldCam = WorldCam;
+
+	WorldCam.Inverse();
+
+	mViewCam = WorldCam;
+	int Width = GetClientWindowRect().right - GetClientWindowRect().left;
+	int Height = GetClientWindowRect().bottom - GetClientWindowRect().top;
+
+	mProjCam.SetPerspectiveFOVLh(1.57f, static_cast<float>(Width / Height), 0.1f, 100.f);
+}
+
+void AppWindow::UpdateModel()
+{
+	Constants constant;
+
+	//Light rotation matrix
+	Math::Matrix4X4 LightRotMatrix;
+	LightRotMatrix.SetIdentity();
+	LightRotMatrix.SetRotationY(RotationY_Light);
+
+	//go about 45 degrees
+	RotationY_Light += 0.785f * mDeltaTime;
+
+	constant.World.SetIdentity();
+
+	constant.View = mViewCam;
+	constant.Projection = mProjCam;
+	constant.CameraPosition = mWorldCam.GetTranslation();
+
+	constant.LightDirection = LightRotMatrix.GetZDirection();
+
+	//Update the constant buffer
+	mConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
+}
+
+void AppWindow::UpdateSkyBox()
+{
+	Constants constant;
+
+	constant.World.SetIdentity();
+	constant.World.SetScale(Math::Vector3D(100.0f, 100.0f, 100.0f));
+	constant.World.SetTranslation(mWorldCam.GetTranslation());
+	constant.View = mViewCam;
+	constant.Projection = mProjCam;
+
+	//Update the constant buffer
+	mSkyConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
+}
+
 //May be deleted, but later
 void AppWindow::OnCreate()
 {
@@ -287,96 +204,106 @@ void AppWindow::OnCreate()
 	Input::InputSystem::Get()->HideCursor(false);
 
 	//Init the texture manager
-	WoodTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\wood.jpg");
+	WoodTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\height_map.png");
+
+	//Load the sky sphere texture
+	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\sky.jpg");
+
+	//Load the actual static mesh
+	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\statue.obj");
+
+	//Load the sky box mesh
+	mSkyMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
 
 	//Initalize the graphics pipline
 	RECT rc = GetClientWindowRect();
 	mSwapChain = GraphicsEngine::Get()->GetRenderSystem()->MakeSwapChain(hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
-	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
+	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -1.0f));
 
-	Math::Vector3D PosList[] =
 	{
-		{Math::Vector3D(-0.5f, -0.5f, -0.5f)},
-		{Math::Vector3D(-0.5f, 0.5f, -0.5f)},
-		{Math::Vector3D(0.5f, 0.5f, -0.5f)},
-		{Math::Vector3D(0.5f, -0.5f, -0.5f)},
+		//Math::Vector3D PosList[] =
+	//{
+	//	{Math::Vector3D(-0.5f, -0.5f, -0.5f)},
+	//	{Math::Vector3D(-0.5f, 0.5f, -0.5f)},
+	//	{Math::Vector3D(0.5f, 0.5f, -0.5f)},
+	//	{Math::Vector3D(0.5f, -0.5f, -0.5f)},
 
-		//Back face
-		{Math::Vector3D(0.5f, -0.5f, 0.5f)},
-		{Math::Vector3D(0.5f, 0.5f, 0.5f)},
-		{Math::Vector3D(-0.5f, 0.5f, 0.5f)},
-		{Math::Vector3D(-0.5f, -0.5f, 0.5f)}
-	};
-
-
-	Math::Vector2D TextureList[] =
-	{
-		{Math::Vector2D(0.0f, 0.0f)},
-		{Math::Vector2D(0.0f, 1.0f)},
-		{Math::Vector2D(1.0f, 0.0f)},
-		{Math::Vector2D(1.0f, 1.0f)}
-	};
-
-	//Vertex list
-	Vertex VList[] =
-	{
-		//FRONT FACE
-		{PosList[0], TextureList[1]},
-		{PosList[1], TextureList[0]},
-		{PosList[2], TextureList[2]},
-		{PosList[3], TextureList[3]},
-
-		//Back Face
-		{PosList[4], TextureList[1]},
-		{PosList[5], TextureList[0]},
-		{PosList[6], TextureList[2]},
-		{PosList[7], TextureList[3]},
-
-		{PosList[1], TextureList[1]},
-		{PosList[6], TextureList[0]},
-		{PosList[5], TextureList[2]},
-		{PosList[2], TextureList[3]},
-
-		{PosList[3], TextureList[1]},
-		{PosList[2], TextureList[0]},
-		{PosList[5], TextureList[2]},
-		{PosList[4], TextureList[3]},
-
-		{PosList[7], TextureList[1]},
-		{PosList[6], TextureList[0]},
-		{PosList[1], TextureList[2]},
-		{PosList[0], TextureList[3]}
-
-	};
-
-	unsigned int IndexList[] =
-	{
-		//Front side
-		0,1,2,
-		2,3,0,
-		//Back side
-		4,5,6,
-		6,7,4,
-		//Top
-		8,9,10,
-		10,11,8,
-		//Bottom
-		12,13,14,
-		14,15,12,
-		//Right side
-		16,17,18,
-		18,19,16,
-		//Left side
-		20,21,22,
-		22,23,20
-	};
+	//	//Back face
+	//	{Math::Vector3D(0.5f, -0.5f, 0.5f)},
+	//	{Math::Vector3D(0.5f, 0.5f, 0.5f)},
+	//	{Math::Vector3D(-0.5f, 0.5f, 0.5f)},
+	//	{Math::Vector3D(-0.5f, -0.5f, 0.5f)}
+	//};
 
 
-	//INDEX BUFFER
-	mIndexBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeIndexBuffer(IndexList, ARRAYSIZE(IndexList));
+	//Math::Vector2D TextureList[] =
+	//{
+	//	{Math::Vector2D(0.0f, 0.0f)},
+	//	{Math::Vector2D(0.0f, 1.0f)},
+	//	{Math::Vector2D(1.0f, 0.0f)},
+	//	{Math::Vector2D(1.0f, 1.0f)}
+	//};
 
-		//ptr to mem buffer
+	////Vertex list
+	//Vertex VList[] =
+	//{
+	//	//FRONT FACE
+	//	{PosList[0], TextureList[1]},
+	//	{PosList[1], TextureList[0]},
+	//	{PosList[2], TextureList[2]},
+	//	{PosList[3], TextureList[3]},
+
+	//	//Back Face
+	//	{PosList[4], TextureList[1]},
+	//	{PosList[5], TextureList[0]},
+	//	{PosList[6], TextureList[2]},
+	//	{PosList[7], TextureList[3]},
+
+	//	{PosList[1], TextureList[1]},
+	//	{PosList[6], TextureList[0]},
+	//	{PosList[5], TextureList[2]},
+	//	{PosList[2], TextureList[3]},
+
+	//	{PosList[3], TextureList[1]},
+	//	{PosList[2], TextureList[0]},
+	//	{PosList[5], TextureList[2]},
+	//	{PosList[4], TextureList[3]},
+
+	//	{PosList[7], TextureList[1]},
+	//	{PosList[6], TextureList[0]},
+	//	{PosList[1], TextureList[2]},
+	//	{PosList[0], TextureList[3]}
+
+	//};
+
+	//unsigned int IndexList[] =
+	//{
+	//	//Front side
+	//	0,1,2,
+	//	2,3,0,
+	//	//Back side
+	//	4,5,6,
+	//	6,7,4,
+	//	//Top
+	//	8,9,10,
+	//	10,11,8,
+	//	//Bottom
+	//	12,13,14,
+	//	14,15,12,
+	//	//Right side
+	//	16,17,18,
+	//	18,19,16,
+	//	//Left side
+	//	20,21,22,
+	//	22,23,20
+	//};
+
+
+	////INDEX BUFFER
+	//mIndexBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeIndexBuffer(IndexList, ARRAYSIZE(IndexList));
+	}
+	//ptr to mem buffer
 	void* ShaderByteCode = nullptr;
 	//the zize if mem buffer in bytes
 	size_t SizeOfShader = 0;
@@ -390,7 +317,7 @@ void AppWindow::OnCreate()
 	mVertexShader = GraphicsEngine::Get()->GetRenderSystem()->MakeVertexShader(ShaderByteCode, SizeOfShader);
 
 	//make the vertex buffer
-	mVertexBuffer = GraphicsEngine::Get()->GetRenderSystem()->CreateVertexBuffer(VList, sizeof(Vertex), ARRAYSIZE(VList), ShaderByteCode, static_cast<UINT>(SizeOfShader));
+	//mVertexBuffer = GraphicsEngine::Get()->GetRenderSystem()->CreateVertexBuffer(VList, sizeof(Vertex), ARRAYSIZE(VList), ShaderByteCode, static_cast<UINT>(SizeOfShader));
 
 	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
 
@@ -403,13 +330,23 @@ void AppWindow::OnCreate()
 	//release the pixel shader
 	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
 
+	/** SKY SPHERE PIXEL SHADER */
+
+	//Compile the pixel shader file
+	GraphicsEngine::Get()->GetRenderSystem()->CompilePixelShader(L"SkyBoxShader.hlsl", "psmain", &ShaderByteCode, &SizeOfShader);
+	//Make the pixel shader
+	mSkyPixelShader = GraphicsEngine::Get()->GetRenderSystem()->MakePixelShader(ShaderByteCode, SizeOfShader);
+	//release the pixel shader
+	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
 
 	Constants constant;
-	constant.mAngle = 0;
 
 	//CONSTANT BUFFER
 	//Make the constant buffer
 	mConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
+
+	//Make the sky sphere's constant buffer
+	mSkyConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
 }
 
 void AppWindow::OnUpdate()
@@ -429,25 +366,16 @@ void AppWindow::OnUpdate()
 	//Update the quad pos
 	Update();
 
-	//Set the constant buffer with vertex and pixel shader
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(mVertexShader, mConstantBuffer);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(mPixelShader, mConstantBuffer);
+	//Set the model face culling(back face culling, i.e. render the outside, cull the inside faces)
+	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(false);
 
-	//SET THE VERTEX AND PIXEL SHADERS
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexShader(mVertexShader);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetPixelShader(mPixelShader);
+	//Render the statue mesh
+	DrawMesh(mMesh, mVertexShader, mPixelShader, mConstantBuffer, WoodTexture);
 
-	//Set texture
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(mPixelShader, WoodTexture);
-
-	//Set the vertex buffer
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(mVertexBuffer);
-
-	//Set the index buffer
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetIndexBuffer(mIndexBuffer);
-
-	//GraphicsEngine::Get()->GetImmDeviceContext()->DrawTriangleStrip(mVertexBuffer->GetVertexSize(), 0);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->DrawIndexTriangleList(mIndexBuffer->GetSizeIndexList(), 0, 0);
+	//Sky sphere face culling set to front face culling
+	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(true);
+	//Render the sky sphere
+	DrawMesh(mSkyMesh, mVertexShader, mSkyPixelShader, mSkyConstantBuffer, SkyTexture);
 
 	mSwapChain->Preseant(true);
 

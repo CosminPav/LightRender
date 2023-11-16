@@ -11,6 +11,7 @@ class SwapChain
 	IDXGISwapChain* dxgiSwapChain = nullptr;
 	//std::unique_ptr<IDXGISwapChain> dxgiSwapChain_Smart = new IDXGISwapChain();
 	ID3D11RenderTargetView* mRenderTargetView = nullptr;
+	ID3D11DepthStencilView* mDepthStencilView = nullptr;
 
 	//Render System ref
 	RenderSystem* mSystem = nullptr;

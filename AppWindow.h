@@ -17,12 +17,21 @@ class AppWindow : public DWindow, public InputListener
 	IndexBufferPtr mIndexBuffer;
 	VertexShaderPtr mVertexShader;
 	PixelShaderPtr mPixelShader;
+	PixelShaderPtr mSkyPixelShader;
 	ConstantBufferPtr mConstantBuffer;
+	ConstantBufferPtr mSkyConstantBuffer;
 
-
+	//Texture
 	TexturePtr WoodTexture;
+	TexturePtr SkyTexture;
+
+	//Mesh
+	MeshPtr mMesh;
+	MeshPtr mSkyMesh;
 
 	Math::Matrix4X4 mWorldCam;
+	Math::Matrix4X4 mViewCam;
+	Math::Matrix4X4 mProjCam;
 
 	float Forward{ 0.0f };
 	float Right{ 0.0f };
@@ -37,12 +46,19 @@ class AppWindow : public DWindow, public InputListener
 	float RotationX{ 0.0f };
 	float RotationY{ 0.0f };
 
+	//Rotate the light on the y axis
+	float RotationY_Light{ 0.0f };
+
 	float Scale{ 1.0f }; 
 public:
 	AppWindow();
 
 	void Update();
+	void UpdateCamera();
+	void UpdateModel();
+	void UpdateSkyBox();
 
+	void DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr& texture);
 	/*
 	INPUT INTERFACE
 	*/

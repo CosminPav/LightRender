@@ -49,6 +49,9 @@
     <Filter Include="Engine\GraphicsEngine\ResourceManager\TextureManager">
       <UniqueIdentifier>{a918dea7-84ab-49ad-ae7f-dc5a4e936e49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\GraphicsEngine\ResourceManager\MeshManager">
+      <UniqueIdentifier>{f42bd5f2-850d-46e0-a30d-1dfbe99cbae9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -101,6 +104,15 @@
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>Engine\GraphicsEngine\ResourceManager\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Engine\GraphicsEngine\ResourceManager\MeshManager</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshManager.cpp">
+      <Filter>Engine\GraphicsEngine\ResourceManager\MeshManager</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexMesh.h">
+      <Filter>Engine\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,12 +185,24 @@
     <ClInclude Include="Vector2D.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\GraphicsEngine\ResourceManager\MeshManager</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshManager.h">
+      <Filter>Engine\GraphicsEngine\ResourceManager\MeshManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Main</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
+      <Filter>Main</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexMeshLayout.hlsl">
+      <Filter>Engine\GraphicsEngine</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBoxShader.hlsl">
       <Filter>Main</Filter>
     </FxCompile>
   </ItemGroup>

@@ -3,12 +3,15 @@ struct VS_INPUT
 {
 	float4 pos : POSITION0;
 	float2 texcoord : TEXCOORD0;
+	float3 normal: NORMAL0;
 };
 
 struct VS_OUTPUT
 {
 	float4 pos : SV_POSITION;
 	float2 texcoord : TEXCOORD0;
+	float3 normal: TEXCOORD1;
+	float3 dir_to_cam: TEXCOORD2;
 };
 
 cbuffer Constants : register(b0)
@@ -17,7 +20,8 @@ cbuffer Constants : register(b0)
 	row_major float4x4 View;
 	row_major float4x4 Projection;
 
-	unsigned int mAngle;
+	float4 CameraPosition;
+	float4 LightDirection;
 };
 
 VS_OUTPUT vsmain(VS_INPUT input )
@@ -29,6 +33,9 @@ VS_OUTPUT vsmain(VS_INPUT input )
 	//World space
 	output.pos = mul(input.pos, World);
 
+	//compute the direction to camera vector
+	output.dir_to_cam = normalize(output.pos.xyz - CameraPosition.xyz);
+
 	//View space
 	output.pos = mul(output.pos, View);
 
@@ -37,5 +44,6 @@ VS_OUTPUT vsmain(VS_INPUT input )
 
 
 	output.texcoord = input.texcoord;
+	output.normal = input.normal;
 	return output;
 }

@@ -46,6 +46,30 @@ SwapChain::SwapChain(HWND hwnd, UINT Width, UINT Height, RenderSystem* System) :
 
 	if (FAILED(hRes))
 		throw std::exception("Swap Chain failed to load");
+
+	D3D11_TEXTURE2D_DESC TexDesc = {};
+	TexDesc.Width = Width;
+	TexDesc.Height = Height;
+	TexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	TexDesc.Usage = D3D11_USAGE_DEFAULT;
+	TexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	TexDesc.MipLevels = 1;
+	TexDesc.SampleDesc.Count = 1;
+	TexDesc.SampleDesc.Quality = 0;
+	TexDesc.MiscFlags = 0;
+	TexDesc.ArraySize = 1;
+	TexDesc.CPUAccessFlags = 0;
+
+	hRes = Sd3dDevice->CreateTexture2D(&TexDesc, nullptr, &Buffer);
+	if (FAILED(hRes)) {
+		throw std::exception("Depth buffer failed to load");
+	}
+
+	hRes = Sd3dDevice->CreateDepthStencilView(Buffer, NULL, &mDepthStencilView);
+	Buffer->Release();
+	if (FAILED(hRes)) {
+		throw std::exception("Depth buffer failed to load");
+	}
 }
 
 
@@ -58,4 +82,5 @@ bool SwapChain::Preseant(bool vSync)
 SwapChain::~SwapChain()
 {	
 	dxgiSwapChain->Release();
+	mRenderTargetView->Release();
 }

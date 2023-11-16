@@ -42,6 +42,12 @@ class RenderSystem
 	ID3DBlob* mPsBlob = nullptr;
 	ID3D11VertexShader* mVertexShader = nullptr;
 	ID3D11PixelShader* mPixelShader = nullptr;
+
+	ID3D11RasterizerState* mCullFrontState = nullptr;
+	ID3D11RasterizerState* mCullBackState = nullptr;
+
+
+	void InitRasterizerState();
 public:
 
 	SwapChainPtr MakeSwapChain(HWND hwnd, UINT Width, UINT Height);
@@ -63,6 +69,8 @@ public:
 	//Custom pixel shader
 	bool CompilePixelShader(const wchar_t* FileName, const char* EntryPointName, void** SharedByteCode, size_t* ByteCodeSize);
 
+	//@bCullFront = true->front face culling otherwise back face culling 
+	void SetRazterizerState(bool bCullFront);
 	//Default destructor
 	~RenderSystem();
 };

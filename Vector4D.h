@@ -1,4 +1,6 @@
 #pragma once
+#include "Vector3D.h"
+
 namespace Math
 {
 	class Vector4D
@@ -15,6 +17,9 @@ namespace Math
 		{}
 
 		Vector4D(const Vector4D& Vec4) : X(Vec4.X), Y(Vec4.Y), Z(Vec4.Z), A(Vec4.A)
+		{}
+
+		Vector4D(const Vector3D& Vec3) :X(Vec3.X), Y(Vec3.Y), Z(Vec3.Z), A(1.0f)
 		{}
 
 		void Cross(Vector4D& v1, Vector4D& v2, Vector4D &v3) 

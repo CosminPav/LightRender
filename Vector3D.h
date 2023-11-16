@@ -20,8 +20,8 @@ namespace Math
 		{}
 
 		//Move Constructor
-		Vector3D(Vector3D&& vector) noexcept : X(vector.X), Y(vector.Y), Z(vector.Z) 
-		{}
+		//Vector3D(Vector3D&& vector) noexcept : X(vector.X), Y(vector.Y), Z(vector.Z) 
+		//{}
 
 		static Vector3D Lerp(const Vector3D& Start, const Vector3D& End, const float& DeltaTime) 
 		{
@@ -42,18 +42,18 @@ namespace Math
 		}
 
 		//Copy assignment opertator
-		Vector3D& operator=(const Vector3D& vec)
-		{
-			X = std::move(vec.X); Y = std::move(vec.Y); Z = std::move(vec.Z);
-			return *this;
-		}
+		//Vector3D& operator=(const Vector3D& vec) noexcept
+		//{
+		//	X = vec.X; Y = vec.Y; Z = vec.Z;
+		//	return *this;
+		//}
 
-		//Move assignment operator
-		Vector3D& operator=(Vector3D&& vec) noexcept
-		{
-			X = vec.X; Y = vec.Y; Z = vec.Z;
-			return *this;
-		}
+		////Move assignment operator
+		//Vector3D& operator=(Vector3D&& vec) noexcept
+		//{
+		//	X = std::move(vec.X); Y =std::move( vec.Y); Z = std::move(vec.Z);
+		//	return *this;
+		//}
 
 		~Vector3D()
 		{}
