@@ -35,6 +35,7 @@ struct Constants
 	Math::Matrix4X4 Projection;
 	Math::Vector4D LightDirection;
 	Math::Vector4D CameraPosition;
+	float Time = 0.0f;
 };
 
 AppWindow::AppWindow()
@@ -71,10 +72,23 @@ void AppWindow::OnKeyUp(int key)
 {
 	Forward = 0.0f;
 	Right = 0.0f;
+
+	if (key == 'G' || key == 'g') {
+		bPlayState = (bPlayState) ? false : true;
+		Input::InputSystem::Get()->HideCursor(!bPlayState);
+	}
+	else if (key == 'F' || key == 'f') {
+		bFullScreenState = (bFullScreenState) ? false : true;
+		if (mSwapChain) {
+			RECT ScreenSize = GetScreenSize();
+			mSwapChain->SetFullScreen(bFullScreenState, ScreenSize.right, ScreenSize.bottom);
+		}
+	}
 }
 
 void AppWindow::OnMouseMove(const Point& MousePos)
 {
+	if (!bPlayState) return;
 	int Width = GetClientWindowRect().right - GetClientWindowRect().left;
 	int Height = GetClientWindowRect().bottom - GetClientWindowRect().top;
 
@@ -89,7 +103,7 @@ void AppWindow::OnLeftMouseButtonDown(const Point& MousePos)
 	Scale = 0.5f;
 }
 
-void AppWindow::DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr& texture)
+void AppWindow::DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr* textureList, UINT NumTextures)
 {
 	//Set the constant buffer with vertex and pixel shader
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(vertexShader, constantBuffer);
@@ -100,7 +114,7 @@ void AppWindow::DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShade
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetPixelShader(pixelShader);
 
 	//Set texture
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(pixelShader, texture);
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(pixelShader, textureList, NumTextures);
 
 	//Set the vertex buffer
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(Mesh->GetVertexBuffer());
@@ -141,8 +155,8 @@ void AppWindow::UpdateCamera()
 	TempMatrix.SetRotationY(RotationY);
 	WorldCam *= TempMatrix;
 
-	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.3f);
-	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.3f);
+	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.1f);
+	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.1f);
 
 	WorldCam.SetTranslation(NewPos);
 	mWorldCam = WorldCam;
@@ -166,7 +180,7 @@ void AppWindow::UpdateModel()
 	LightRotMatrix.SetRotationY(RotationY_Light);
 
 	//go about 45 degrees
-	RotationY_Light += 0.785f * mDeltaTime;
+	RotationY_Light += 0.307 * mDeltaTime;
 
 	constant.World.SetIdentity();
 
@@ -176,6 +190,7 @@ void AppWindow::UpdateModel()
 
 	constant.LightDirection = LightRotMatrix.GetZDirection();
 
+	constant.Time = mTime;
 	//Update the constant buffer
 	mConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
 }
@@ -194,6 +209,53 @@ void AppWindow::UpdateSkyBox()
 	mSkyConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
 }
 
+void AppWindow::Render()
+{
+	//CLEAR RENDER TARGET COLOR
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->ClearRenderTargetColor(mSwapChain, 0.0f, 0.4f, 0.2f, 1);
+
+	RECT rc = GetClientWindowRect();
+
+	//SET THE VIEWPORT SIZE
+	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetViewportSize(rc.right - rc.left, rc.bottom - rc.top);
+
+	//Update the quad pos
+	Update();
+
+	//Set the model face culling(back face culling, i.e. render the outside, cull the inside faces)
+	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(false);
+
+	//Texture list
+	TexturePtr TexList[4];
+	TexList[0] = EarthColorTexture;
+	TexList[1] = EarthSpecularTexture;
+	TexList[2] = EarthCloudsTexture;
+	TexList[3] = EarthColorTexture_Night;
+
+	//Render the earth model
+	DrawMesh(mMesh, mVertexShader, mPixelShader, mConstantBuffer, TexList, 4);
+
+	//Sky sphere face culling set to front face culling
+	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(true);
+
+	//Update the list for the sky texture
+	TexList[0] = SkyTexture;
+
+	//Render the sky sphere
+	DrawMesh(mSkyMesh, mVertexShader, mSkyPixelShader, mSkyConstantBuffer, TexList, 1);
+
+	mSwapChain->Preseant(true);
+
+
+	//Delta time computations
+	mOldDeltaTime = mNewDeltaTime;
+	mNewDeltaTime = static_cast<float>(GetTickCount64());
+	mDeltaTime = (mNewDeltaTime) ? ((mNewDeltaTime - mOldDeltaTime) / 1000.0f) : 0;
+
+	//Clouds anim offset
+	mTime += mDeltaTime;
+}
+
 //May be deleted, but later
 void AppWindow::OnCreate()
 {
@@ -201,16 +263,21 @@ void AppWindow::OnCreate()
 
 	//Register input system
 	Input::InputSystem::Get()->AddListener(this);
+
+	bPlayState = true;
 	Input::InputSystem::Get()->HideCursor(false);
 
-	//Init the texture manager
-	WoodTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\height_map.png");
+	//Load textures
+	EarthColorTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_color.jpg");
+	EarthSpecularTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_spec.jpg");
+	EarthCloudsTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\clouds.jpg");
+	EarthColorTexture_Night = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_night.jpg");
 
 	//Load the sky sphere texture
-	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\sky.jpg");
+	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\stars_map.jpg");
 
 	//Load the actual static mesh
-	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\statue.obj");
+	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
 
 	//Load the sky box mesh
 	mSkyMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
@@ -347,6 +414,8 @@ void AppWindow::OnCreate()
 
 	//Make the sky sphere's constant buffer
 	mSkyConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
+
+	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
 }
 
 void AppWindow::OnUpdate()
@@ -355,41 +424,13 @@ void AppWindow::OnUpdate()
 
 	Input::InputSystem::Get()->Update();
 
-	//CLEAR RENDER TARGET COLOR
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->ClearRenderTargetColor(mSwapChain, 0.0f, 0.4f, 0.2f, 1);
-
-	RECT rc = GetClientWindowRect();
-
-	//SET THE VIEWPORT SIZE
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetViewportSize(rc.right - rc.left, rc.bottom - rc.top);
-	
-	//Update the quad pos
-	Update();
-
-	//Set the model face culling(back face culling, i.e. render the outside, cull the inside faces)
-	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(false);
-
-	//Render the statue mesh
-	DrawMesh(mMesh, mVertexShader, mPixelShader, mConstantBuffer, WoodTexture);
-
-	//Sky sphere face culling set to front face culling
-	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(true);
-	//Render the sky sphere
-	DrawMesh(mSkyMesh, mVertexShader, mSkyPixelShader, mSkyConstantBuffer, SkyTexture);
-
-	mSwapChain->Preseant(true);
-
-
-	//Delta time computations
-	mOldDeltaTime = mNewDeltaTime;
-	mNewDeltaTime = static_cast<float>(GetTickCount64());
-	mDeltaTime = (mNewDeltaTime) ? ((mNewDeltaTime - mOldDeltaTime) / 1000.0f) : 0;
-
+	Render();
 }
 
 void AppWindow::OnDestroy()
 {
 	DWindow::OnDestroy();	
+	mSwapChain->SetFullScreen(false, 1, 1);
 }
 
 void AppWindow::OnFocus()
@@ -402,5 +443,18 @@ void AppWindow::StopFocus()
 {
 	DWindow::StopFocus();
 	Input::InputSystem::Get()->RemoveListener(this);
+}
+
+void AppWindow::OnSize()
+{
+	//Get the window size
+	RECT rc = GetClientWindowRect();
+
+	//Resize the swap chain buffers
+	if (mSwapChain) {
+		mSwapChain->Resize(rc.right, rc.bottom);
+	}
+	//Update the window while resizing
+	Render();
 }
 

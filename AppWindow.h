@@ -22,7 +22,10 @@ class AppWindow : public DWindow, public InputListener
 	ConstantBufferPtr mSkyConstantBuffer;
 
 	//Texture
-	TexturePtr WoodTexture;
+	TexturePtr EarthColorTexture;	//Earth color map
+	TexturePtr EarthSpecularTexture;	//Earth specular map
+	TexturePtr EarthCloudsTexture;	//Earth clouds map
+	TexturePtr EarthColorTexture_Night;	//Earth night color map
 	TexturePtr SkyTexture;
 
 	//Mesh
@@ -46,19 +49,27 @@ class AppWindow : public DWindow, public InputListener
 	float RotationX{ 0.0f };
 	float RotationY{ 0.0f };
 
+	//When true the window is in play mode and the cursor is hidden, when false it is in window mode 
+	bool bPlayState{ false };
+	bool bFullScreenState{ false };
+
 	//Rotate the light on the y axis
 	float RotationY_Light{ 0.0f };
+
+	//Clouds animation offset
+	float mTime{ 0.0f };
 
 	float Scale{ 1.0f }; 
 public:
 	AppWindow();
 
+	void Render();
 	void Update();
 	void UpdateCamera();
 	void UpdateModel();
 	void UpdateSkyBox();
 
-	void DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr& texture);
+	void DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr* textureList, UINT NumTextures);
 	/*
 	INPUT INTERFACE
 	*/
@@ -82,7 +93,7 @@ public:
 	virtual void OnDestroy() override;
 	virtual void OnFocus() override;
 	virtual void StopFocus() override;
-
+	virtual void OnSize() override;
 	
 
 };

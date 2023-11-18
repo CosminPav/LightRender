@@ -31,8 +31,8 @@ public:
 	void SetConstantBuffer(const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer);
 
 	//Texture coord
-	void SetTexture(const VertexShaderPtr& vertexShader, const TexturePtr& Texture);
-	void SetTexture(const PixelShaderPtr& pixelShader, const TexturePtr& Texture);
+	void SetTexture(const VertexShaderPtr& vertexShader, const TexturePtr* Texture, UINT NumTextures);
+	void SetTexture(const PixelShaderPtr& pixelShader, const TexturePtr* Texture, UINT NumTextures);
 
 
 	//VertexShdaer

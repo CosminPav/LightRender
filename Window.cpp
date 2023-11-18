@@ -41,7 +41,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		window->StopFocus();
 		break;
 	}
-
+	case WM_SIZE:
+	{
+		DWindow* window = (DWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if(window)
+			window->OnSize();
+		break;
+	}
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}
@@ -74,7 +80,7 @@ DWindow::DWindow()
 
 	//Creation of the window
 	hwnd = CreateWindowEx(0, L"MyWindowClass", L"DirectX Application",
-		WS_CAPTION | WS_SYSMENU | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768,
+		WS_CAPTION | WS_SYSMENU | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 1024,
 		NULL, NULL, NULL, NULL);
 
 	//if the creation fail return false
@@ -128,6 +134,16 @@ RECT DWindow::GetClientWindowRect()
 	return rc;
 }
 
+RECT DWindow::GetScreenSize()
+{
+	RECT rc;
+	//Get the screen width
+	rc.right = GetSystemMetrics(SM_CXSCREEN);
+	//Get the screen height
+	rc.bottom = GetSystemMetrics(SM_CYSCREEN); 
+	return rc;
+}
+
 
 void DWindow::OnCreate()
 {
@@ -147,6 +163,10 @@ void DWindow::OnFocus()
 }
 
 void DWindow::StopFocus()
+{
+}
+
+void DWindow::OnSize()
 {
 }
 

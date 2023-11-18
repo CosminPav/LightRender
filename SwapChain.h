@@ -20,6 +20,12 @@ public:
 	SwapChain(HWND hwnd, UINT Width, UINT Height, RenderSystem* System);
 	bool Preseant(bool vSync);
 
+	//Resize the buffers in the swap chain
+	void Resize(UINT width, UINT height);
+	void ReloadBuffers(UINT width, UINT height);
+
+	//@FullScreen to false = window mode ->WIndowed, FUll screen true = window mode ->Full Screen
+	void SetFullScreen(bool FullScreen, UINT width, UINT height);
 	//Default destructor
 	~SwapChain();
 };

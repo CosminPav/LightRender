@@ -9,6 +9,7 @@ class Texture : public Resource
 
 	ID3D11Resource* mResource = nullptr;
 	ID3D11ShaderResourceView* mShaderResourceView = nullptr;
+	ID3D11SamplerState* mSamplerState = nullptr;
 public:
 	Texture(const wchar_t* FullPath);
 	~Texture();

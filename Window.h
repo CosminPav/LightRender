@@ -17,12 +17,14 @@ public:
 
 	//Get the size of the window
 	RECT GetClientWindowRect();
+	RECT GetScreenSize();
 
 	virtual void OnCreate();
 	virtual void OnUpdate();
 	virtual void OnDestroy();
 	virtual void OnFocus();
 	virtual void StopFocus();
+	virtual void OnSize();
 
 	//Default destructor
 	~DWindow() noexcept;
