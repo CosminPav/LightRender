@@ -19,6 +19,8 @@ class TextureManager;
 class Mesh;
 class MeshManager;
 
+class Material;
+
 //using SwapChainPtr = std::unique_ptr<SwapChain>;
 
 typedef std::shared_ptr<SwapChain> SwapChainPtr;
@@ -35,3 +37,5 @@ typedef std::shared_ptr<Resource> ResourcePtr;
 typedef std::shared_ptr<Texture>TexturePtr;
 
 typedef std::shared_ptr<Mesh> MeshPtr;
+
+typedef std::shared_ptr<Material> MaterialPtr;

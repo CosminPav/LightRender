@@ -28,6 +28,11 @@ public:
 
 	void GetVertexMeshLayoutSharedByteCodeAndSize(void** ByteCode, size_t* size);
 
+	//Make the material
+	MaterialPtr MakeMaterial(const wchar_t* VertexShaderPath, const wchar_t* PixelShaderPath);
+	MaterialPtr MakeMaterial(const MaterialPtr& material);
+	void SetMaterial(const MaterialPtr& MaterialToSet);
+
 	static GraphicsEngine* Get();
 	static void Create();
 	static void Release();

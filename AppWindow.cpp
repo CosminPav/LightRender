@@ -20,6 +20,7 @@
 #include "Point.h"
 
 #include "Mesh.h"
+#include "Material.h"
 
 struct Vertex
 {
@@ -35,6 +36,9 @@ struct Constants
 	Math::Matrix4X4 Projection;
 	Math::Vector4D LightDirection;
 	Math::Vector4D CameraPosition;
+	Math::Vector4D LightPosition = Math::Vector4D(0.0f, 1.0f, 0.0f, 0.0f);
+	float LightRadius{ 6.0f };
+
 	float Time = 0.0f;
 };
 
@@ -45,7 +49,7 @@ AppWindow::AppWindow()
 void AppWindow::Update()
 {
 	UpdateCamera();
-	UpdateModel();
+	UpdateLight();
 	UpdateSkyBox();
 }
 
@@ -65,6 +69,12 @@ void AppWindow::OnKeyDown(int key)
 	else if (key == 'D' || key == 'd') {
 		//RotationY -= 3.19f * mDeltaTime;
 		Right = 1.0f;
+	}
+	else if (key == 'O' || key == 'o') {
+		mLightRadius -= 1.0f * mDeltaTime;
+	}
+	else if (key == 'P' || key == 'p') {
+		mLightRadius += 1.0f * mDeltaTime;
 	}
 }
 
@@ -103,19 +113,10 @@ void AppWindow::OnLeftMouseButtonDown(const Point& MousePos)
 	Scale = 0.5f;
 }
 
-void AppWindow::DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr* textureList, UINT NumTextures)
+void AppWindow::DrawMesh(const MeshPtr& Mesh, const MaterialPtr& Material)
 {
-	//Set the constant buffer with vertex and pixel shader
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(vertexShader, constantBuffer);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetConstantBuffer(pixelShader, constantBuffer);
-
-	//SET THE VERTEX AND PIXEL SHADERS
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexShader(vertexShader);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetPixelShader(pixelShader);
-
-	//Set texture
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetTexture(pixelShader, textureList, NumTextures);
-
+	//Set the mesh material
+	GraphicsEngine::Get()->SetMaterial(Material);
 	//Set the vertex buffer
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(Mesh->GetVertexBuffer());
 
@@ -170,7 +171,7 @@ void AppWindow::UpdateCamera()
 	mProjCam.SetPerspectiveFOVLh(1.57f, static_cast<float>(Width / Height), 0.1f, 100.f);
 }
 
-void AppWindow::UpdateModel()
+void AppWindow::UpdateModel(Math::Vector3D Position, const MaterialPtr& Material)
 {
 	Constants constant;
 
@@ -179,20 +180,20 @@ void AppWindow::UpdateModel()
 	LightRotMatrix.SetIdentity();
 	LightRotMatrix.SetRotationY(RotationY_Light);
 
-	//go about 45 degrees
-	RotationY_Light += 0.307 * mDeltaTime;
-
 	constant.World.SetIdentity();
-
+	constant.World.SetTranslation(Position);
 	constant.View = mViewCam;
 	constant.Projection = mProjCam;
 	constant.CameraPosition = mWorldCam.GetTranslation();
 
+
+	constant.LightPosition = mLightPosition;
+	constant.LightRadius = mLightRadius;
 	constant.LightDirection = LightRotMatrix.GetZDirection();
 
 	constant.Time = mTime;
 	//Update the constant buffer
-	mConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
+	Material->SetData(&constant, sizeof(Constants));
 }
 
 void AppWindow::UpdateSkyBox()
@@ -206,7 +207,17 @@ void AppWindow::UpdateSkyBox()
 	constant.Projection = mProjCam;
 
 	//Update the constant buffer
-	mSkyConstantBuffer->Update(GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext(), &constant);
+	SkySphereMaterial->SetData(&constant, sizeof(Constants));
+}
+void AppWindow::UpdateLight()
+{
+	//go about 45 degrees
+	RotationY_Light += 1.57f * mDeltaTime;
+
+	float DistFromOrigin = 3.0f;
+
+	mLightPosition = Math::Vector4D(cos(RotationY_Light) * DistFromOrigin, 2.0f, sin(RotationY_Light) * DistFromOrigin, 1.0f);
+
 }
 
 void AppWindow::Render()
@@ -222,27 +233,22 @@ void AppWindow::Render()
 	//Update the quad pos
 	Update();
 
-	//Set the model face culling(back face culling, i.e. render the outside, cull the inside faces)
-	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(false);
+	for (float i = 0; i < 3.0f; ++i) {
+		//Render the earth model
+		UpdateModel(Math::Vector3D(0.0f, 2.0f,-4.0f+ 4.0f * i), MeshMaterial);
+		DrawMesh(mSkyMesh, MeshMaterial);
 
-	//Texture list
-	TexturePtr TexList[4];
-	TexList[0] = EarthColorTexture;
-	TexList[1] = EarthSpecularTexture;
-	TexList[2] = EarthCloudsTexture;
-	TexList[3] = EarthColorTexture_Night;
+		UpdateModel(Math::Vector3D(4.0f, 2.0f, -4.0f + 4.0f * i), EarthMaterial);
+		DrawMesh(mTorusMesh, EarthMaterial);
 
-	//Render the earth model
-	DrawMesh(mMesh, mVertexShader, mPixelShader, mConstantBuffer, TexList, 4);
-
-	//Sky sphere face culling set to front face culling
-	GraphicsEngine::Get()->GetRenderSystem()->SetRazterizerState(true);
-
-	//Update the list for the sky texture
-	TexList[0] = SkyTexture;
+		UpdateModel(Math::Vector3D(-4.0f, 2.0f, -4.0f + 4.0f * i), BrickMaterial);
+		DrawMesh(mMonkeyHeadMesh, BrickMaterial);
+	}
+	UpdateModel(Math::Vector3D(0.0f, 0.0f, 0.0f), MeshMaterial);
+	DrawMesh(mPlaneMesh, MeshMaterial);
 
 	//Render the sky sphere
-	DrawMesh(mSkyMesh, mVertexShader, mSkyPixelShader, mSkyConstantBuffer, TexList, 1);
+	DrawMesh(mSkyMesh, SkySphereMaterial);
 
 	mSwapChain->Preseant(true);
 
@@ -268,16 +274,19 @@ void AppWindow::OnCreate()
 	Input::InputSystem::Get()->HideCursor(false);
 
 	//Load textures
+	WallTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\wall.jpg");
+	BricksTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\brick.png");
 	EarthColorTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_color.jpg");
-	EarthSpecularTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_spec.jpg");
-	EarthCloudsTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\clouds.jpg");
-	EarthColorTexture_Night = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_night.jpg");
 
 	//Load the sky sphere texture
-	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\stars_map.jpg");
+	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\sky.jpg");
 
 	//Load the actual static mesh
-	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
+	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\scene.obj");
+
+	mTorusMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\torus.obj");
+	mMonkeyHeadMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\suzanne.obj");
+	mPlaneMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\plane.obj");
 
 	//Load the sky box mesh
 	mSkyMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
@@ -288,134 +297,32 @@ void AppWindow::OnCreate()
 
 	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -1.0f));
 
-	{
-		//Math::Vector3D PosList[] =
-	//{
-	//	{Math::Vector3D(-0.5f, -0.5f, -0.5f)},
-	//	{Math::Vector3D(-0.5f, 0.5f, -0.5f)},
-	//	{Math::Vector3D(0.5f, 0.5f, -0.5f)},
-	//	{Math::Vector3D(0.5f, -0.5f, -0.5f)},
 
-	//	//Back face
-	//	{Math::Vector3D(0.5f, -0.5f, 0.5f)},
-	//	{Math::Vector3D(0.5f, 0.5f, 0.5f)},
-	//	{Math::Vector3D(-0.5f, 0.5f, 0.5f)},
-	//	{Math::Vector3D(-0.5f, -0.5f, 0.5f)}
-	//};
+	/** MAKE THE MATERIAL */
 
+	//Mesh material
+	MeshMaterial = GraphicsEngine::Get()->MakeMaterial(L"PointLightVertexShader.hlsl", L"PointLightPixelShader.hlsl");
+	MeshMaterial->AddTexture(WallTexture);
+	MeshMaterial->SetCullMode(ECullMode::Back);
 
-	//Math::Vector2D TextureList[] =
-	//{
-	//	{Math::Vector2D(0.0f, 0.0f)},
-	//	{Math::Vector2D(0.0f, 1.0f)},
-	//	{Math::Vector2D(1.0f, 0.0f)},
-	//	{Math::Vector2D(1.0f, 1.0f)}
-	//};
+	//Earth material
+	EarthMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	EarthMaterial->AddTexture(EarthColorTexture);
+	EarthMaterial->SetCullMode(ECullMode::Back);
 
-	////Vertex list
-	//Vertex VList[] =
-	//{
-	//	//FRONT FACE
-	//	{PosList[0], TextureList[1]},
-	//	{PosList[1], TextureList[0]},
-	//	{PosList[2], TextureList[2]},
-	//	{PosList[3], TextureList[3]},
-
-	//	//Back Face
-	//	{PosList[4], TextureList[1]},
-	//	{PosList[5], TextureList[0]},
-	//	{PosList[6], TextureList[2]},
-	//	{PosList[7], TextureList[3]},
-
-	//	{PosList[1], TextureList[1]},
-	//	{PosList[6], TextureList[0]},
-	//	{PosList[5], TextureList[2]},
-	//	{PosList[2], TextureList[3]},
-
-	//	{PosList[3], TextureList[1]},
-	//	{PosList[2], TextureList[0]},
-	//	{PosList[5], TextureList[2]},
-	//	{PosList[4], TextureList[3]},
-
-	//	{PosList[7], TextureList[1]},
-	//	{PosList[6], TextureList[0]},
-	//	{PosList[1], TextureList[2]},
-	//	{PosList[0], TextureList[3]}
-
-	//};
-
-	//unsigned int IndexList[] =
-	//{
-	//	//Front side
-	//	0,1,2,
-	//	2,3,0,
-	//	//Back side
-	//	4,5,6,
-	//	6,7,4,
-	//	//Top
-	//	8,9,10,
-	//	10,11,8,
-	//	//Bottom
-	//	12,13,14,
-	//	14,15,12,
-	//	//Right side
-	//	16,17,18,
-	//	18,19,16,
-	//	//Left side
-	//	20,21,22,
-	//	22,23,20
-	//};
+	//BrickMaterial
+	BrickMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	BrickMaterial->AddTexture(BricksTexture);
+	BrickMaterial->SetCullMode(ECullMode::Back);
 
 
-	////INDEX BUFFER
-	//mIndexBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeIndexBuffer(IndexList, ARRAYSIZE(IndexList));
-	}
-	//ptr to mem buffer
-	void* ShaderByteCode = nullptr;
-	//the zize if mem buffer in bytes
-	size_t SizeOfShader = 0;
-
-	//VERTEX SHADER
-
-	//compile the vertex shader from file
-	GraphicsEngine::Get()->GetRenderSystem()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &ShaderByteCode, &SizeOfShader);
-
-	//Create the verrtex shader
-	mVertexShader = GraphicsEngine::Get()->GetRenderSystem()->MakeVertexShader(ShaderByteCode, SizeOfShader);
-
-	//make the vertex buffer
-	//mVertexBuffer = GraphicsEngine::Get()->GetRenderSystem()->CreateVertexBuffer(VList, sizeof(Vertex), ARRAYSIZE(VList), ShaderByteCode, static_cast<UINT>(SizeOfShader));
-
-	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
-
-	//PIXEL SHADER
+	//Sky sphere material
+	SkySphereMaterial = GraphicsEngine::Get()->MakeMaterial(L"PointLightVertexShader.hlsl", L"SkyBoxShader.hlsl");
+	SkySphereMaterial->AddTexture(SkyTexture);
+	SkySphereMaterial->SetCullMode(ECullMode::Front);
 	
-	//Compile the pixel shader file
-	GraphicsEngine::Get()->GetRenderSystem()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &ShaderByteCode, &SizeOfShader);
-	//Make the pixel shader
-	mPixelShader = GraphicsEngine::Get()->GetRenderSystem()->MakePixelShader(ShaderByteCode, SizeOfShader);
-	//release the pixel shader
-	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
-
-	/** SKY SPHERE PIXEL SHADER */
-
-	//Compile the pixel shader file
-	GraphicsEngine::Get()->GetRenderSystem()->CompilePixelShader(L"SkyBoxShader.hlsl", "psmain", &ShaderByteCode, &SizeOfShader);
-	//Make the pixel shader
-	mSkyPixelShader = GraphicsEngine::Get()->GetRenderSystem()->MakePixelShader(ShaderByteCode, SizeOfShader);
-	//release the pixel shader
-	GraphicsEngine::Get()->GetRenderSystem()->ReleaseCompiledShaders();
-
-	Constants constant;
-
-	//CONSTANT BUFFER
-	//Make the constant buffer
-	mConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
-
-	//Make the sky sphere's constant buffer
-	mSkyConstantBuffer = GraphicsEngine::Get()->GetRenderSystem()->MakeConstantBuffer(&constant, sizeof(constant));
-
-	mWorldCam.SetTranslation(Math::Vector3D(0.0f, 0.0f, -2.0f));
+	//Set camera starting trasnlastion
+	mWorldCam.SetTranslation(Math::Vector3D(2.0f, 2.0f, 0.0f));
 }
 
 void AppWindow::OnUpdate()

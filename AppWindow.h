@@ -22,6 +22,8 @@ class AppWindow : public DWindow, public InputListener
 	ConstantBufferPtr mSkyConstantBuffer;
 
 	//Texture
+	TexturePtr WallTexture;
+	TexturePtr BricksTexture;
 	TexturePtr EarthColorTexture;	//Earth color map
 	TexturePtr EarthSpecularTexture;	//Earth specular map
 	TexturePtr EarthCloudsTexture;	//Earth clouds map
@@ -30,7 +32,16 @@ class AppWindow : public DWindow, public InputListener
 
 	//Mesh
 	MeshPtr mMesh;
+	MeshPtr mTorusMesh;
+	MeshPtr mMonkeyHeadMesh;
+	MeshPtr mPlaneMesh;
 	MeshPtr mSkyMesh;
+
+	//Materials
+	MaterialPtr MeshMaterial;
+	MaterialPtr BrickMaterial;
+	MaterialPtr EarthMaterial;
+	MaterialPtr SkySphereMaterial;
 
 	Math::Matrix4X4 mWorldCam;
 	Math::Matrix4X4 mViewCam;
@@ -60,16 +71,21 @@ class AppWindow : public DWindow, public InputListener
 	float mTime{ 0.0f };
 
 	float Scale{ 1.0f }; 
+
+	float mLightRadius{6.0f };
+
+	Math::Vector4D mLightPosition;
 public:
 	AppWindow();
 
 	void Render();
 	void Update();
 	void UpdateCamera();
-	void UpdateModel();
+	void UpdateModel(Math::Vector3D Position, const MaterialPtr& Material);
 	void UpdateSkyBox();
+	void UpdateLight();
 
-	void DrawMesh(const MeshPtr& Mesh, const VertexShaderPtr& vertexShader, const PixelShaderPtr& pixelShader, const ConstantBufferPtr& constantBuffer, const TexturePtr* textureList, UINT NumTextures);
+	void DrawMesh(const MeshPtr& Mesh, const MaterialPtr& Material);
 	/*
 	INPUT INTERFACE
 	*/
