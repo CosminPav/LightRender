@@ -131,6 +131,8 @@ RECT DWindow::GetClientWindowRect()
 {
 	RECT rc;
 	GetClientRect(hwnd, &rc);
+	ClientToScreen(hwnd, (LPPOINT)&rc.left);
+	ClientToScreen(hwnd, (LPPOINT)&rc.right);
 	return rc;
 }
 

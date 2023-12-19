@@ -27,7 +27,7 @@ cbuffer Constants : register(b0)
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	float4 textureColor = TextureColor.Sample(TextureSampler, (1.0 - input.texcoord));		//color map
+	float4 textureColor = TextureColor.Sample(TextureSampler, float2(input.texcoord.x, 1.0 - input.texcoord.y));		//color map
 
 	/** AMBIENT LIGHT */
 	float Ka = 1.5;	//Ambient reflection factor
@@ -60,7 +60,7 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float3 DiffuseLight =( Kd * Id * AmountDiffuseLight) / Attenuation;  //Diffuse light
 
 	/** SPECULAR LIGHT */
-	float Ks = 1.0;			//Specular reflection factor
+	float Ks = 0.0;			//Specular reflection factor
 	float3  dir_to_cam = normalize(input.world_pos.xyz - CameraPosition.xyz);
 	float3 Is = float3(1.0f, 1.0f, 1.0f);		//Specular light color
 

@@ -7,52 +7,28 @@
 
 class DWindow;
 
-class AppWindow : public DWindow, public InputListener
+class SpaceShooter : public DWindow, public InputListener
 {
 	SwapChainPtr mSwapChain = nullptr;
-	VertexBufferPtr mVertexBuffer;
-	IndexBufferPtr mIndexBuffer;
-	VertexShaderPtr mVertexShader;
-	PixelShaderPtr mPixelShader;
-	PixelShaderPtr mSkyPixelShader;
-	ConstantBufferPtr mConstantBuffer;
-	ConstantBufferPtr mSkyConstantBuffer;
+
 
 	//Texture
-	TexturePtr WallTexture;
-	TexturePtr EarthColorTexture;	//Earth color map
-	TexturePtr EarthSpecularTexture;	//Earth specular map
-	TexturePtr EarthCloudsTexture;	//Earth clouds map
-	TexturePtr EarthColorTexture_Night;	//Earth night color map
 	TexturePtr SkyTexture;
-	TexturePtr TerrainTexture;
+	TexturePtr ShipTexture;
+	TexturePtr AsteroidTexture;
 
-	//House scene textures
-	TexturePtr BarrelTexture;
-	TexturePtr BricksTexture;
-	TexturePtr WindowTexture;
-	TexturePtr WoodTexture;
-	
 	//Mesh
 	MeshPtr mMesh;
-	MeshPtr mTorusMesh;
-	MeshPtr mMonkeyHeadMesh;
-	MeshPtr mPlaneMesh;
 	MeshPtr mSkyMesh;
-	MeshPtr mTerrainMesh;
-	MeshPtr mHouseMesh;
+	MeshPtr mShipMesh;
+	MeshPtr mAsterioidMesh;
 
 	//Materials
 	MaterialPtr MeshMaterial;
-	MaterialPtr EarthMaterial;
 	MaterialPtr SkySphereMaterial;
-	MaterialPtr TerrainMaterial;
+	MaterialPtr ShipMaterial;
+	MaterialPtr AsteroidMaterial;
 
-	//House scene materials
-	MaterialPtr BarrelMaterial;
-	MaterialPtr BricksMaterial;
-	MaterialPtr WindowMaterial;
-	MaterialPtr WoodMaterial;
 
 	Math::Matrix4X4 mWorldCam;
 	Math::Matrix4X4 mViewCam;
@@ -65,38 +41,56 @@ class AppWindow : public DWindow, public InputListener
 	float mNewDeltaTime{ 0.0f };
 	float mDeltaTime{ 0.0f };
 
-	float mDeltaPos{ 0.0f };
-	float mDeltaScale{ 0.0f };
+	Math::Vector3D mCurrentCameraPostion;
+	Math::Vector3D mCameraPosition;
 
-	float RotationX{ 0.0f };
-	float RotationY{ 0.0f };
+	Math::Vector3D mCurrentCameraRotation;
+	Math::Vector3D mCameraRotation;
+	float mDeltaMouseX{ 0.0f };
+	float mDeltaMouseY{ 0.0f };
+
+	float mCameraDistance{ 24.0f };
+	float mCurrentCameraDistance{ 0.0f };
+	
+	Math::Vector3D mShipPosition;
+	Math::Vector3D mCurrentShipPos;
+
+	Math::Vector3D mCurrentShipRotation;
+	Math::Vector3D mShipRotation;
+
+	float ShipSpeed{ 125.0f };
 
 	//When true the window is in play mode and the cursor is hidden, when false it is in window mode 
 	bool bPlayState{ false };
 	bool bFullScreenState{ false };
+	bool bTurboMode{ false };
 
 	//Rotate the light on the y axis
 	float RotationY_Light{ 0.0f };
 
+	Math::Matrix4X4 LightRotMatrix;
+
 	//Clouds animation offset
 	float mTime{ 0.0f };
 
-	float Scale{ 1.0f }; 
-
-	float mLightRadius{600.0f };
+	Math::Vector3D mAsteroidsPositions[500];
+	Math::Vector3D mAsteroidsRotations[500];
+	Math::Vector3D mAteroidsScales[500];
 
 	Math::Vector4D mLightPosition;
 
 	std::vector<MaterialPtr> mMaterials;
 public:
-	AppWindow();
+	SpaceShooter();
 
 	void Render();
 	void Update();
 	void UpdateCamera();
-	void UpdateModel(Math::Vector3D Position, const std::vector<MaterialPtr>& Materials);
+	void UpdateThirdPersonCamera();
+	void UpdateModel(Math::Vector3D Position, Math::Vector3D Rotaion, Math::Vector3D Scale, const std::vector<MaterialPtr>& Materials);
 	void UpdateSkyBox();
 	void UpdateLight();
+	void UpdateShip();
 
 	void DrawMesh(const MeshPtr& Mesh, const std::vector<MaterialPtr>& Materials);
 	/*
@@ -115,7 +109,7 @@ public:
 	END OF INPUT INTERFACE
 	*/
 
-	~AppWindow() {}
+	~SpaceShooter() {}
 
 	virtual void OnCreate() override;
 	virtual void OnUpdate() override;

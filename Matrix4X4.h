@@ -164,6 +164,10 @@ namespace Math
 		{
 			return Vector3D(mMat[0][0], mMat[0][1], mMat[0][2]);
 		}
+		Vector3D GetYDirection()
+		{
+			return Vector3D(mMat[1][0], mMat[1][1], mMat[1][2]);
+		}
 		Vector3D GetTranslation()
 		{
 			return Vector3D(mMat[3][0], mMat[3][1], mMat[3][2]);

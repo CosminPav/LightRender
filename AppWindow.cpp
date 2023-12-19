@@ -55,27 +55,59 @@ void AppWindow::Update()
 
 void AppWindow::OnKeyDown(int key)
 {
-	if (key == 'W' || key == 'w') {
-		//RotationX += 3.19f * mDeltaTime;
+	switch (key) {
+	case 'W': case 'w':
+	{
 		Forward = 1.0f;
+		break;
 	}
-	else if (key == 'S' || key == 's') {
-		//RotationX -= 3.19f * mDeltaTime;
+	case 'S': case's':
+	{
 		Forward = -1.0f;
-	}else if (key == 'A' || key == 'a') {
-		//RotationY += 3.19f * mDeltaTime;
+		break;
+	}
+	case 'A': case 'a':
+	{
 		Right = -1.0f;
-	}
-	else if (key == 'D' || key == 'd') {
-		//RotationY -= 3.19f * mDeltaTime;
+		break;
+	}case 'D': case 'd':
+	{
 		Right = 1.0f;
-	}
-	else if (key == 'O' || key == 'o') {
+		break;
+	}case 'O': case 'o':
+	{
 		mLightRadius -= 1.0f * mDeltaTime;
-	}
-	else if (key == 'P' || key == 'p') {
+		break;
+	}case 'P': case 'p':
+	{
 		mLightRadius += 1.0f * mDeltaTime;
+		break;
 	}
+	default:
+		break;
+	}
+
+	//if (key == 'W' || key == 'w') {
+	//	//RotationX += 3.19f * mDeltaTime;
+	//	Forward = 1.0f;
+	//}
+	//else if (key == 'S' || key == 's') {
+	//	//RotationX -= 3.19f * mDeltaTime;
+	//	Forward = -1.0f;
+	//}else if (key == 'A' || key == 'a') {
+	//	//RotationY += 3.19f * mDeltaTime;
+	//	Right = -1.0f;
+	//}
+	//else if (key == 'D' || key == 'd') {
+	//	//RotationY -= 3.19f * mDeltaTime;
+	//	Right = 1.0f;
+	//}
+	//else if (key == 'O' || key == 'o') {
+	//	mLightRadius -= 1.0f * mDeltaTime;
+	//}
+	//else if (key == 'P' || key == 'p') {
+	//	mLightRadius += 1.0f * mDeltaTime;
+	//}
 }
 
 void AppWindow::OnKeyUp(int key)
@@ -113,18 +145,24 @@ void AppWindow::OnLeftMouseButtonDown(const Point& MousePos)
 	Scale = 0.5f;
 }
 
-void AppWindow::DrawMesh(const MeshPtr& Mesh, const MaterialPtr& Material)
+void AppWindow::DrawMesh(const MeshPtr& Mesh, const std::vector<MaterialPtr>& Materials)
 {
-	//Set the mesh material
-	GraphicsEngine::Get()->SetMaterial(Material);
 	//Set the vertex buffer
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetVertexBuffer(Mesh->GetVertexBuffer());
 
 	//Set the index buffer
 	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->SetIndexBuffer(Mesh->GetIndexBuffer());
 
-	//GraphicsEngine::Get()->GetImmDeviceContext()->DrawTriangleStrip(mVertexBuffer->GetVertexSize(), 0);
-	GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->DrawIndexTriangleList(Mesh->GetIndexBuffer()->GetSizeIndexList(), 0, 0);
+
+	for (size_t m = 0; m < Mesh->GetNumMaterials(); ++m) {
+
+		if (m >= Materials.size()) break;
+
+		MaterialSlot Mat = Mesh->GetMaterialSlot(m);
+		//Set the mesh material
+		GraphicsEngine::Get()->SetMaterial(Materials[m]);
+		GraphicsEngine::Get()->GetRenderSystem()->GetImmDeviceContext()->DrawIndexTriangleList(Mat.NumIndices,0, Mat.StartIndex);
+	}
 }
 
 void AppWindow::OnLeftMouseButtonUp(const Point& MousePos)
@@ -156,8 +194,8 @@ void AppWindow::UpdateCamera()
 	TempMatrix.SetRotationY(RotationY);
 	WorldCam *= TempMatrix;
 
-	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.1f);
-	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.1f);
+	Math::Vector3D NewPos = mWorldCam.GetTranslation() + WorldCam.GetZDirection() * (Forward * 0.15f);
+	NewPos = NewPos + WorldCam.GetXDirection() * (Right * 0.15f);
 
 	WorldCam.SetTranslation(NewPos);
 	mWorldCam = WorldCam;
@@ -171,7 +209,7 @@ void AppWindow::UpdateCamera()
 	mProjCam.SetPerspectiveFOVLh(1.57f, static_cast<float>(Width / Height), 0.1f, 100.f);
 }
 
-void AppWindow::UpdateModel(Math::Vector3D Position, const MaterialPtr& Material)
+void AppWindow::UpdateModel(Math::Vector3D Position, const std::vector<MaterialPtr>& Materials)
 {
 	Constants constant;
 
@@ -193,7 +231,9 @@ void AppWindow::UpdateModel(Math::Vector3D Position, const MaterialPtr& Material
 
 	constant.Time = mTime;
 	//Update the constant buffer
-	Material->SetData(&constant, sizeof(Constants));
+	for (size_t m = 0; m < Materials.size(); ++m) {
+		Materials[m]->SetData(&constant, sizeof(Constants));
+	}
 }
 
 void AppWindow::UpdateSkyBox()
@@ -212,12 +252,12 @@ void AppWindow::UpdateSkyBox()
 void AppWindow::UpdateLight()
 {
 	//go about 45 degrees
-	RotationY_Light += 1.57f * mDeltaTime;
+	RotationY_Light += .707f * mDeltaTime;
 
 	float DistFromOrigin = 3.0f;
 
-	mLightPosition = Math::Vector4D(cos(RotationY_Light) * DistFromOrigin, 2.0f, sin(RotationY_Light) * DistFromOrigin, 1.0f);
-
+	//mLightPosition = Math::Vector4D(cos(RotationY_Light) * DistFromOrigin, 2.0f, sin(RotationY_Light) * DistFromOrigin, 1.0f);
+	mLightPosition = Math::Vector4D(180.0f, 140.0f,70.0f, 1.0f);
 }
 
 void AppWindow::Render()
@@ -233,22 +273,32 @@ void AppWindow::Render()
 	//Update the quad pos
 	Update();
 
-	for (float i = 0; i < 3.0f; ++i) {
-		//Render the earth model
-		UpdateModel(Math::Vector3D(0.0f, 2.0f,-4.0f+ 4.0f * i), MeshMaterial);
-		DrawMesh(mSkyMesh, MeshMaterial);
+	//Render the terrain model
+	mMaterials.clear();
+	mMaterials.push_back(TerrainMaterial);
+	UpdateModel(Math::Vector3D(0.0f, 0.0f, 0.0f), mMaterials);
 
-		UpdateModel(Math::Vector3D(4.0f, 2.0f, -4.0f + 4.0f * i), EarthMaterial);
-		DrawMesh(mTorusMesh, EarthMaterial);
+	DrawMesh(mTerrainMesh, mMaterials);
 
-		UpdateModel(Math::Vector3D(-4.0f, 2.0f, -4.0f + 4.0f * i), BrickMaterial);
-		DrawMesh(mMonkeyHeadMesh, BrickMaterial);
+	//Render the scene house
+	mMaterials.clear();
+	mMaterials.push_back(BarrelMaterial);
+	mMaterials.push_back(BricksMaterial);
+	mMaterials.push_back(WindowMaterial);
+	mMaterials.push_back(WoodMaterial);
+
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			UpdateModel(Math::Vector3D(-14.0f + 14.0f*i, 0.0f, 14.0f + 14.0f*j), mMaterials);
+			DrawMesh(mHouseMesh, mMaterials);
+		}
 	}
-	UpdateModel(Math::Vector3D(0.0f, 0.0f, 0.0f), MeshMaterial);
-	DrawMesh(mPlaneMesh, MeshMaterial);
 
+	mMaterials.clear();
+	mMaterials.push_back(SkySphereMaterial);
+	
 	//Render the sky sphere
-	DrawMesh(mSkyMesh, SkySphereMaterial);
+	DrawMesh(mSkyMesh, mMaterials);
 
 	mSwapChain->Preseant(true);
 
@@ -274,22 +324,31 @@ void AppWindow::OnCreate()
 	Input::InputSystem::Get()->HideCursor(false);
 
 	//Load textures
-	WallTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\wall.jpg");
-	BricksTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\brick.png");
-	EarthColorTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_color.jpg");
+	//WallTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\wall.jpg");
+	//EarthColorTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\earth_color.jpg");
 
 	//Load the sky sphere texture
-	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\sky.jpg");
+	SkyTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\stars_map.jpg");
+	TerrainTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\ground.jpg");
+
+	//House scene textures
+	BarrelTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\barrel.jpg");
+	WindowTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\house_windows.jpg");
+	BricksTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\house_brick.jpg");
+	WoodTexture = GraphicsEngine::Get()->GetTextureManager()->CreatTextureFromFile(L"Assets\\Textures\\house_wood.jpg");
 
 	//Load the actual static mesh
-	mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\scene.obj");
+	//mMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\scene.obj");
 
-	mTorusMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\torus.obj");
-	mMonkeyHeadMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\suzanne.obj");
-	mPlaneMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\plane.obj");
+	//mTorusMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\torus.obj");
+	//mMonkeyHeadMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\suzanne.obj");
+	//mPlaneMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\plane.obj");
 
 	//Load the sky box mesh
 	mSkyMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\sphere.obj");
+	mTerrainMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\terrain.obj");
+
+	mHouseMesh = GraphicsEngine::Get()->GetMeshManager()->CreateMeshFromFile(L"Assets\\Meshes\\house.obj");
 
 	//Initalize the graphics pipline
 	RECT rc = GetClientWindowRect();
@@ -305,16 +364,28 @@ void AppWindow::OnCreate()
 	MeshMaterial->AddTexture(WallTexture);
 	MeshMaterial->SetCullMode(ECullMode::Back);
 
-	//Earth material
-	EarthMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
-	EarthMaterial->AddTexture(EarthColorTexture);
-	EarthMaterial->SetCullMode(ECullMode::Back);
 
-	//BrickMaterial
-	BrickMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
-	BrickMaterial->AddTexture(BricksTexture);
-	BrickMaterial->SetCullMode(ECullMode::Back);
+	TerrainMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	TerrainMaterial->AddTexture(TerrainTexture);
+	TerrainMaterial->SetCullMode(ECullMode::Back);
 
+	//House scene material loadings
+
+	BarrelMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	BarrelMaterial->AddTexture(BarrelTexture);
+	BarrelMaterial->SetCullMode(ECullMode::Back);
+
+	WindowMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	WindowMaterial->AddTexture(WindowTexture);
+	WindowMaterial->SetCullMode(ECullMode::Back);
+
+	WoodMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	WoodMaterial->AddTexture(WoodTexture);
+	WoodMaterial->SetCullMode(ECullMode::Back);
+
+	BricksMaterial = GraphicsEngine::Get()->MakeMaterial(MeshMaterial);
+	BricksMaterial->AddTexture(BricksTexture);
+	BricksMaterial->SetCullMode(ECullMode::Back);
 
 	//Sky sphere material
 	SkySphereMaterial = GraphicsEngine::Get()->MakeMaterial(L"PointLightVertexShader.hlsl", L"SkyBoxShader.hlsl");
@@ -323,6 +394,8 @@ void AppWindow::OnCreate()
 	
 	//Set camera starting trasnlastion
 	mWorldCam.SetTranslation(Math::Vector3D(2.0f, 2.0f, 0.0f));
+
+	mMaterials.reserve(32);
 }
 
 void AppWindow::OnUpdate()

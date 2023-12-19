@@ -1,6 +1,7 @@
-#include "AppWindow.h"
+//#include "AppWindow.h"
 #include "GraphicsEngine.h"
 #include "InputSystem.h"
+#include "SpaceShooter.h"
 
 int main()
 {
@@ -14,7 +15,7 @@ int main()
 	}
 
 	try {
-		AppWindow App;
+		SpaceShooter App;
 		while (App.IsRunning());
 	}
 	catch (...) {

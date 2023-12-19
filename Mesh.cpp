@@ -24,9 +24,11 @@ Mesh::Mesh(const wchar_t* FullPath) :Resource(FullPath)
 	std::string InputFile(size_needed, 0);
 	WideCharToMultiByte(CP_UTF8, 0, &FullPath[0], wcslen(FullPath), &InputFile[0], size_needed, NULL, NULL);
 
-//	std::string InputFile = //std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(FullPath);
+	//std::string InputFile = //std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(FullPath);
 
-	bool bRes = tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, InputFile.c_str());
+	std::string MTL_Dir = InputFile.substr(0, InputFile.find_last_of("\\/"));
+
+	bool bRes = tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, InputFile.c_str(), MTL_Dir.c_str());
 
 	if (!err.empty())
 		throw std::exception("Mesh failed to load");
@@ -34,46 +36,60 @@ Mesh::Mesh(const wchar_t* FullPath) :Resource(FullPath)
 		throw std::exception("Mesh failed to load");
 	}
 
-	if (shapes.size() > 1)
-		throw std::exception("Shapes vector has more than 1 elem");
-
 	std::vector<Math::VertexMesh> VerticesList;
 	std::vector<unsigned int> IndicesList;
 
-	//for(size_t s = 0; s<shapes.size(); ++s)
-	//for(size_t f = 0; f<shapes[s].mesh.num_face_vertices.size(); ++f)
-	//Go through each shape
-	for (size_t s = 0; s < shapes.size(); ++s) {
-		size_t IndexOffset = 0;
-		VerticesList.reserve(shapes[s].mesh.indices.size());
-		IndicesList.reserve(shapes[s].mesh.indices.size());
+	size_t SizeVertexIndexLists = 0;
 
-		//Go through each face of the shape 
-		for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f) {
-			unsigned char NumFaceVerts = shapes[s].mesh.num_face_vertices[f];
-			
-			for (unsigned char v = 0; v < NumFaceVerts; ++v) {
-				tinyobj::index_t Index = shapes[s].mesh.indices[IndexOffset + v];
+	for (size_t i = 0; i < shapes.size(); ++i) {
+		SizeVertexIndexLists += shapes[i].mesh.indices.size();
+	}
+	
+	VerticesList.reserve(SizeVertexIndexLists);
+	IndicesList.reserve(SizeVertexIndexLists);
 
-				tinyobj::real_t vx = attributes.vertices[Index.vertex_index * 3 +0];
-				tinyobj::real_t vy = attributes.vertices[Index.vertex_index * 3 +1 ];
-				tinyobj::real_t vz = attributes.vertices[Index.vertex_index * 3 + 2];
+	MaterialSlots.resize(materials.size());
 
-				tinyobj::real_t tx = attributes.texcoords[Index.texcoord_index * 2 + 0];
-				tinyobj::real_t ty = attributes.texcoords[Index.texcoord_index * 2 + 1];
+	size_t GlobalIndexOffset = 0;
 
-				//Get the normals
-				tinyobj::real_t nx = attributes.normals[Index.normal_index * 3 + 0];
-				tinyobj::real_t ny = attributes.normals[Index.normal_index * 3 + 1];
-				tinyobj::real_t nz = attributes.normals[Index.normal_index * 3 + 2];
+	for (size_t m = 0; m < materials.size(); ++m) {
+		MaterialSlots[m].StartIndex = GlobalIndexOffset;
+		MaterialSlots[m].MaterialId = m;
 
-				Math::VertexMesh vMesh(Math::Vector3D(vx, vy, vz), Math::Vector2D(tx, ty), Math::Vector3D(nx, ny, nz));
-				VerticesList.push_back(vMesh);
+		//Go through each shape
+		for (size_t s = 0; s < shapes.size(); ++s) {
+			size_t IndexOffset = 0;
 
-				IndicesList.push_back(static_cast<unsigned int>(IndexOffset)+ v);
+			//Go through each face of the shape 
+			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f) {
+				if (shapes[s].mesh.material_ids[f] != m) continue;
+				unsigned char NumFaceVerts = shapes[s].mesh.num_face_vertices[f];
+
+				for (unsigned char v = 0; v < NumFaceVerts; ++v) {
+					tinyobj::index_t Index = shapes[s].mesh.indices[IndexOffset + v];
+
+					tinyobj::real_t vx = attributes.vertices[Index.vertex_index * 3 + 0];
+					tinyobj::real_t vy = attributes.vertices[Index.vertex_index * 3 + 1];
+					tinyobj::real_t vz = attributes.vertices[Index.vertex_index * 3 + 2];
+
+					tinyobj::real_t tx = attributes.texcoords[Index.texcoord_index * 2 + 0];
+					tinyobj::real_t ty = attributes.texcoords[Index.texcoord_index * 2 + 1];
+
+					//Get the normals
+					tinyobj::real_t nx = attributes.normals[Index.normal_index * 3 + 0];
+					tinyobj::real_t ny = attributes.normals[Index.normal_index * 3 + 1];
+					tinyobj::real_t nz = attributes.normals[Index.normal_index * 3 + 2];
+
+					Math::VertexMesh vMesh(Math::Vector3D(vx, vy, vz), Math::Vector2D(tx, ty), Math::Vector3D(nx, ny, nz));
+					VerticesList.push_back(vMesh);
+
+					IndicesList.push_back(static_cast<unsigned int>(GlobalIndexOffset) + v);
+				}
+				IndexOffset += NumFaceVerts;
+				GlobalIndexOffset += NumFaceVerts;
 			}
-			IndexOffset += NumFaceVerts;
 		}
+		MaterialSlots[m].NumIndices = GlobalIndexOffset - MaterialSlots[m].StartIndex;
 	}
 
 	void* ShaderByteCode = nullptr;
