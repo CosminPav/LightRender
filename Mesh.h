@@ -4,6 +4,10 @@
 #include "IndexBuffer.h"
 #include <vector>
 
+#include "Vector2D.h"
+#include "Vector3D.h"
+
+
 struct MaterialSlot
 {
 	size_t StartIndex{ 0 };
@@ -28,5 +32,11 @@ public:
 	inline const MaterialSlot& GetMaterialSlot(unsigned int Slot) const { return (Slot >= MaterialSlots.size()) ?  MaterialSlot() :  MaterialSlots[Slot]; }
 	inline size_t GetNumMaterials() const { return MaterialSlots.size(); }
 	~Mesh();
+
+private:
+	void ComputeTangents(
+		const Math::Vector3D& V0, const Math::Vector3D& V1, const Math::Vector3D& V2,
+		const Math::Vector2D& T0, const Math::Vector2D& T1, const Math::Vector2D& T2,
+		Math::Vector3D& Tangent, Math::Vector3D& Bitangent);
 };
 

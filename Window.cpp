@@ -79,8 +79,8 @@ DWindow::DWindow()
 	}
 
 	//Creation of the window
-	hwnd = CreateWindowEx(0, L"MyWindowClass", L"DirectX Application",
-		WS_CAPTION | WS_SYSMENU | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 1024,
+	hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"DirectX Application",
+		WS_CAPTION | WS_SYSMENU | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768,
 		NULL, NULL, NULL, NULL);
 
 	//if the creation fail return false
@@ -108,12 +108,12 @@ bool DWindow::Broadcast()
 		bIsInit = true;
 	}
 
-	this->OnUpdate();
-
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	
+	this->OnUpdate();
 
 	Sleep(1);
 

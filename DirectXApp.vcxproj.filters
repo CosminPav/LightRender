@@ -79,6 +79,12 @@
     <Filter Include="Main\GlobalShaders\PointLightShaders">
       <UniqueIdentifier>{c1c957b2-d754-47a5-be02-7262500edb7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main\NormalMappingDemo">
+      <UniqueIdentifier>{081ad58a-0768-4fb1-a665-db9195c60b96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\GlobalShaders\DirectionLightNormalMapping">
+      <UniqueIdentifier>{2b43d120-d036-4c17-a203-25955a3ebae0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -146,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="SpaceShooter.cpp">
       <Filter>Main\SpaceShooterDemo</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalMapping.cpp">
+      <Filter>Main\NormalMappingDemo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +242,9 @@
     <ClInclude Include="MathUtilis.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="NormalMapping.h">
+      <Filter>Main\NormalMappingDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexMeshLayout.hlsl">
@@ -261,6 +273,12 @@
     </FxCompile>
     <FxCompile Include="SkyBoxVertexShader.hlsl">
       <Filter>Main\GlobalShaders\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="NormalMap_VertexShader_DirLight.hlsl">
+      <Filter>Main\GlobalShaders\DirectionLightNormalMapping</Filter>
+    </FxCompile>
+    <FxCompile Include="NormalMap_PixelShader_DirLight.hlsl">
+      <Filter>Main\GlobalShaders\DirectionLightNormalMapping</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

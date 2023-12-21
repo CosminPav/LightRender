@@ -65,6 +65,10 @@ Mesh::Mesh(const wchar_t* FullPath) :Resource(FullPath)
 				if (shapes[s].mesh.material_ids[f] != m) continue;
 				unsigned char NumFaceVerts = shapes[s].mesh.num_face_vertices[f];
 
+				//Compute the tangent vector for each face
+				Math::Vector3D VerticesFaces[3];
+				Math::Vector2D TexcoordsFaces[3];
+
 				for (unsigned char v = 0; v < NumFaceVerts; ++v) {
 					tinyobj::index_t Index = shapes[s].mesh.indices[IndexOffset + v];
 
@@ -74,13 +78,47 @@ Mesh::Mesh(const wchar_t* FullPath) :Resource(FullPath)
 
 					tinyobj::real_t tx = attributes.texcoords[Index.texcoord_index * 2 + 0];
 					tinyobj::real_t ty = attributes.texcoords[Index.texcoord_index * 2 + 1];
+					/*if (attributes.texcoords.size()) {
+						tx =
+						ty =
+					}*/
+					VerticesFaces[v] = Math::Vector3D(vx, vy, vz);
+					TexcoordsFaces[v] = Math::Vector2D(tx, ty);
+				}
+				Math::Vector3D tangent, bitangent;
+				ComputeTangents(VerticesFaces[0], VerticesFaces[1], VerticesFaces[2], TexcoordsFaces[0], TexcoordsFaces[1], TexcoordsFaces[2], tangent, bitangent);
+
+
+				for (unsigned char v = 0; v < NumFaceVerts; ++v) {
+					tinyobj::index_t Index = shapes[s].mesh.indices[IndexOffset + v];
+
+					tinyobj::real_t vx = attributes.vertices[Index.vertex_index * 3 + 0];
+					tinyobj::real_t vy = attributes.vertices[Index.vertex_index * 3 + 1];
+					tinyobj::real_t vz = attributes.vertices[Index.vertex_index * 3 + 2];
+
+					tinyobj::real_t tx = attributes.texcoords[Index.texcoord_index * 2 + 0];
+					tinyobj::real_t ty = attributes.texcoords[Index.texcoord_index * 2 + 1];
+					/*if (attributes.texcoords.size()) {
+						tx = 
+						ty = 
+					}*/
 
 					//Get the normals
 					tinyobj::real_t nx = attributes.normals[Index.normal_index * 3 + 0];
 					tinyobj::real_t ny = attributes.normals[Index.normal_index * 3 + 1];
 					tinyobj::real_t nz = attributes.normals[Index.normal_index * 3 + 2];
+					/*if (attributes.normals.size()) {
+						nx = 
+						ny = 
+						nz = 
+					}*/
 
-					Math::VertexMesh vMesh(Math::Vector3D(vx, vy, vz), Math::Vector2D(tx, ty), Math::Vector3D(nx, ny, nz));
+					Math::Vector3D v_tangent, v_bitangent;
+					v_bitangent = Math::Vector3D::CrossProduct(Math::Vector3D(nx, ny, nz), tangent);
+					v_tangent = Math::Vector3D::CrossProduct(v_bitangent, Math::Vector3D(nx, ny, nz));
+
+
+					Math::VertexMesh vMesh(Math::Vector3D(vx, vy, vz), Math::Vector2D(tx, ty), Math::Vector3D(nx, ny, nz), v_tangent, v_bitangent);
 					VerticesList.push_back(vMesh);
 
 					IndicesList.push_back(static_cast<unsigned int>(GlobalIndexOffset) + v);
@@ -105,4 +143,26 @@ Mesh::Mesh(const wchar_t* FullPath) :Resource(FullPath)
 Mesh::~Mesh()
 {
 	//delete this;
+}
+
+void Mesh::ComputeTangents(const Math::Vector3D& V0, const Math::Vector3D& V1, const Math::Vector3D& V2, 
+	const Math::Vector2D& T0, const Math::Vector2D& T1, const Math::Vector2D& T2, 
+	Math::Vector3D& Tangent, Math::Vector3D& Bitangent)
+{
+	Math::Vector3D DeltaPos_1 = V1 - V0;
+	Math::Vector3D DeltaPos_2 = V2 - V0;
+
+	Math::Vector2D DeltaUV_1 = T1 - T0;
+	Math::Vector2D DeltaUV_2 = T2 - T0;
+
+	float R = 1.0f / (DeltaUV_1.X * DeltaUV_2.Y - DeltaUV_1.Y * DeltaUV_2.X);
+
+	//Get the tangent factor
+	Tangent = (DeltaPos_1 * DeltaUV_2.Y - DeltaPos_2 * DeltaUV_1.Y);
+
+	//Normalize tangent factor
+	Tangent = Math::Vector3D::Normalize(Tangent);
+
+	Bitangent = (DeltaPos_2 * DeltaUV_1.X - DeltaPos_1 * DeltaUV_2.X);
+	Bitangent = Math::Vector3D::Normalize(Bitangent);
 }

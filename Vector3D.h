@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 
 namespace Math 
 {
@@ -19,9 +20,6 @@ namespace Math
 		Vector3D(const Vector3D& vector) : X(vector.X), Y(vector.Y), Z(vector.Z)
 		{}
 
-		//Move Constructor
-		//Vector3D(Vector3D&& vector) noexcept : X(vector.X), Y(vector.Y), Z(vector.Z) 
-		//{}
 
 		static Vector3D Lerp(const Vector3D& Start, const Vector3D& End, const float& DeltaTime) 
 		{
@@ -32,13 +30,39 @@ namespace Math
 			return Vec;
 		}
 
-		Vector3D operator*(float Num) 
+		static Vector3D Normalize(const Vector3D& Vector) 
+		{
+			Vector3D Res;
+			float Length = sqrt((Vector.X * Vector.X) + (Vector.Y * Vector.Y) + (Vector.Z * Vector.Z));
+			if (!Length)
+				return Vector3D();
+			Res.X = Vector.X / Length;
+			Res.Y = Vector.Y / Length;
+			Res.Z = Vector.Z / Length;
+
+			return Res;
+		}
+
+		static Vector3D CrossProduct(const Vector3D& Vec_1, const Vector3D& Vec_2) {
+			Vector3D Res;
+
+			Res.X = (Vec_1.Y * Vec_2.Z) - (Vec_1.Z * Vec_2.Y);
+			Res.Y = (Vec_1.Z * Vec_2.X) - (Vec_1.X * Vec_2.Z);
+			Res.Z = (Vec_1.X * Vec_2.Y) - (Vec_1.Y * Vec_2.X);
+
+			return Res;
+		}
+
+		Vector3D operator*(float Num) const
 		{
 			return Vector3D(X * Num, Y * Num, Z * Num);
 		}
-		Vector3D operator+(Vector3D Vec)
+		Vector3D operator+(const Vector3D& Vec) const
 		{
 			return Vector3D(X + Vec.X, Y +Vec.Y, Z + Vec.Z);
+		}
+		Vector3D operator-(const Vector3D& Vec) const {
+			return Vector3D(X - Vec.X, Y - Vec.Y, Z - Vec.Z);
 		}
 
 		//Copy assignment opertator

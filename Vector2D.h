@@ -19,13 +19,16 @@ namespace Math
 		Vector2D(const Vector2D& vector) : X(vector.X), Y(vector.Y)
 		{}
 
-		Vector2D operator*(float Num)
+		Vector2D operator*(float Num) const
 		{
 			return Vector2D(X * Num, Y * Num);
 		}
-		Vector2D operator+(Vector2D Vec)
+		Vector2D operator+(const Vector2D& Vec) const
 		{
 			return Vector2D(X + Vec.X, Y + Vec.Y);
+		}
+		Vector2D operator-(const Vector2D& Source) const {
+			return Vector2D(X - Source.X, Y - Source.Y);
 		}
 
 		~Vector2D()

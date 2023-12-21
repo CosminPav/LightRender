@@ -10,17 +10,20 @@ namespace Math
 		Vector3D Position;
 		Vector2D TexCoord;
 		Vector3D Normal;
+		Vector3D Tangent;
+		Vector3D Bitangent;
 	public:
 
 		//Defalt constructor
-		VertexMesh() : Position(), TexCoord(), Normal()
+		VertexMesh() : Position(), TexCoord(), Normal(), Tangent(), Bitangent()
 		{}
 
 		//overloaded constructor
-		VertexMesh(Vector3D pos, Vector2D texcoord, Vector3D normal) : Position(pos), TexCoord(texcoord), Normal(normal)
+		VertexMesh(const Vector3D& pos,const Vector2D& texcoord, const Vector3D& normal, const Vector3D& tangent, const Vector3D& binormal) 
+			: Position(pos), TexCoord(texcoord), Normal(normal), Tangent(tangent), Bitangent(binormal)
 		{}
 		//Copy constructor
-		VertexMesh(const VertexMesh& Vertex) : Position(Vertex.Position), TexCoord(Vertex.TexCoord), Normal(Vertex.Normal)
+		VertexMesh(const VertexMesh& Vertex) : Position(Vertex.Position), TexCoord(Vertex.TexCoord), Normal(Vertex.Normal), Tangent(Vertex.Tangent), Bitangent(Vertex.Bitangent)
 		{}
 
 		~VertexMesh()

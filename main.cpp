@@ -1,7 +1,7 @@
 //#include "AppWindow.h"
 #include "GraphicsEngine.h"
 #include "InputSystem.h"
-#include "SpaceShooter.h"
+#include "NormalMapping.h"
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
 	}
 
 	try {
-		SpaceShooter App;
+		NormalMapping App;
 		while (App.IsRunning());
 	}
 	catch (...) {
