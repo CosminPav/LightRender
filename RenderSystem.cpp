@@ -7,6 +7,7 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include <d3dcompiler.h>
+#include <exception>
 
 #include <iostream>
 
