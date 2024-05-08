@@ -136,6 +136,8 @@ VertexBufferPtr RenderSystem::CreateVertexBuffer(void* ListVertices, UINT SizeVe
         Vb = std::make_shared <VertexBuffer>(ListVertices, SizeVertex, ListSize, ShaderByteCode, SizeShderByte, this);
     }
     catch (...) {
+      //catch exception by ref and display the error 
+      //to the out. stream
     }
 
     return Vb;
