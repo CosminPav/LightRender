@@ -120,8 +120,9 @@ SwapChainPtr RenderSystem::MakeSwapChain(HWND hwnd, UINT Width, UINT Height)
     try {
         Sc = std::make_shared<SwapChain>(hwnd, Width, Height, this);
     }
-    catch (...) {
-
+    catch (std::exception& e) {
+       //catch and handle, cause i can't look like crazy
+       //std::cout<<e.what();
     }
     return Sc;
 }
