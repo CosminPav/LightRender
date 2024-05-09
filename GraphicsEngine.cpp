@@ -20,6 +20,7 @@ GraphicsEngine::GraphicsEngine()
     //create the texture manager
     try {
         mTextureManager = new TextureManager();
+        //mTextureManager = std::make_unique<TextureManager>();
     }
     catch (...) {
         throw std::exception("Texture Manager failed to create");
@@ -28,6 +29,7 @@ GraphicsEngine::GraphicsEngine()
     //Create the mesh manager
     try {
         mMeshManager = new MeshManager();
+        //mMeshManager = std::make_unique<MeshManager>();
     }
     catch (...) {
         throw std::exception("Mesh Manager failed to create");
