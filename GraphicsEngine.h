@@ -10,7 +10,9 @@ class GraphicsEngine
 	//std::unique_ptr<RenderSystem> mSystemPtr;
 	RenderSystem* mSystem = nullptr;
 	TextureManager* mTextureManager = nullptr;
+ //std::unique_ptr<TextureManager> mTextureManager;
 	MeshManager* mMeshManager = nullptr;
+ //std::unique_ptr<MeshManager> mMeshManager;
 	static GraphicsEngine* mEngine;
 
 	unsigned char MeshLayoutByteCode[1024];
