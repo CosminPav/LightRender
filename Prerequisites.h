@@ -19,6 +19,10 @@ class TextureManager;
 class Mesh;
 class MeshManager;
 
+
+
+class Rect;
+class Game_Master;
 class Material;
 
 //using SwapChainPtr = std::unique_ptr<SwapChain>;
@@ -39,3 +43,13 @@ typedef std::shared_ptr<Texture>TexturePtr;
 typedef std::shared_ptr<Mesh> MeshPtr;
 
 typedef std::shared_ptr<Material> MaterialPtr;
+
+typedef std::shared_ptr<Rect> RectPtr;
+
+
+#define CROC_ERROR(message)
+{
+\
+std::wcout<<throw std::runtime_error("");
+/
+}
