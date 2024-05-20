@@ -5,6 +5,8 @@
 #include "MeshManager.h"
 #include <memory>
 
+//REMOVE THE SINGLETON PATTERN, NOT VERY EFFICIENT
+
 class GraphicsEngine
 {
 	//std::unique_ptr<RenderSystem> mSystemPtr;
