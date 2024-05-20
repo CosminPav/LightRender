@@ -43,6 +43,7 @@ VertexBuffer::VertexBuffer(void* ListVertices, UINT SizeVertex, UINT ListSize, v
     //Create the input layout
     if (FAILED(mSystem->d3dDevice->CreateInputLayout(IDesc, LayoutSize, ShaderByteCode, SizeShderByte, &mInLayout))) {
         throw std::exception("Input Layout failed to load");
+//CROC_ERROR("Input Layout failed to load");
     }
 }
 
