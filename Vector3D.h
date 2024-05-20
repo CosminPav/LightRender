@@ -1,4 +1,4 @@
-#pragma once
+9#pragma once
 
 #include <cmath>
 
@@ -18,7 +18,7 @@ namespace Math
 		{}
 		//Copy constructor
 		Vector3D(const Vector3D& vector) : X(vector.X), Y(vector.Y), Z(vector.Z)
-		{}
+		{}  //Delete this, move only class
 
 
 		static Vector3D Lerp(const Vector3D& Start, const Vector3D& End, const float& DeltaTime) 
